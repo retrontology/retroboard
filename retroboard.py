@@ -101,11 +101,19 @@ class retroboard(tk.Frame):
         secondary_device_frame = tk.Frame(device_frame)
         secondary_device_frame.columnconfigure(0, weight=1)
         secondary_device_frame.grid(column=0, row=3, sticky='nsew', in_=device_frame)
-        secondary_device_menu = tk.OptionMenu(secondary_device_frame, self.secondary_device, *device_names)
-        secondary_device_menu.grid(column=0, row=0, sticky='nsew')
-        secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
-        secondary_device_enable_box = tk.Checkbutton(secondary_device_frame, text='Use', variable=secondary_device_enable)
-        secondary_device_enable_box.grid(column=1, row=0, sticky='nsew')
+        self.secondary_device_menu = tk.OptionMenu(secondary_device_frame, self.secondary_device, *device_names)
+        self.secondary_device_menu.grid(column=0, row=0, sticky='nsew')
+        self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
+        secondary_device_enable_button = tk.Checkbutton(secondary_device_frame, text='Use', variable=self.secondary_device_enable, command=self.toggle_secondary_device_enable)
+        self.toggle_secondary_device_enable()
+        secondary_device_enable_button.grid(column=1, row=0, sticky='nsew')
+        
+    
+    def toggle_secondary_device_enable(self):
+        if self.secondary_device_enable.get():
+            self.secondary_device_menu.configure(state='normal')
+        else:
+            self.secondary_device_menu.configure(state='disabled')
 
     def add_button_callback(self):
         pass
