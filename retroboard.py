@@ -88,15 +88,19 @@ class retroboard(tk.Frame):
         default_device = sounddevice.query_devices(kind='output')['name']
 
         # Primary output
+        primary_device_label = tk.Label(device_frame, text='Primary Output Device')
+        primary_device_label.grid(column=0, row=0, sticky='w')
         self.primary_device = tk.StringVar(self, default_device, 'primary_device')
         primary_device_menu = tk.OptionMenu(device_frame, self.primary_device, *device_names)
-        primary_device_menu.grid(column=0, row=0, sticky='nsew', in_=device_frame)
+        primary_device_menu.grid(column=0, row=1, sticky='nsew', in_=device_frame)
 
         # Secondary output
+        secondary_device_label = tk.Label(device_frame, text='Secondary Output Device')
+        secondary_device_label.grid(column=0, row=2, sticky='w')
         self.secondary_device = tk.StringVar(self, default_device, 'secondary_device')
         secondary_device_frame = tk.Frame(device_frame)
         secondary_device_frame.columnconfigure(0, weight=1)
-        secondary_device_frame.grid(column=0, row=1, sticky='nsew', in_=device_frame)
+        secondary_device_frame.grid(column=0, row=3, sticky='nsew', in_=device_frame)
         secondary_device_menu = tk.OptionMenu(secondary_device_frame, self.secondary_device, *device_names)
         secondary_device_menu.grid(column=0, row=0, sticky='nsew')
         secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
