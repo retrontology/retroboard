@@ -1,7 +1,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import sounddevice
-import soundfile
+import pydub
+import pydub.playback
 from entryframe import EntryFrame
 import os.path
 
@@ -118,6 +119,15 @@ class RetroBoard(tk.Frame):
         else:
             self.secondary_device_menu.configure(state='disabled')
     
+    def play_file(self, filename):
+        audio_file = pydub.AudioSegment.from_file(filename)
+        audio_file = audio_file.split_to_mono()[0]
+        print(audio_file.sample_width)
+        data = audio_file.get_array_of_samples()
+        sounddevice.play(data, audio_file.frame_rate, device=self.primary_device.get())
+        if self.secondary_device_enable.get():
+            sounddevice.play(data, audio_file.frame_rate, device=self.secondary_device.get())
+    
     def add_to_table(self, filename, hotkeys=''):
         name = os.path.basename(filename)
         self.audio_table.insert('', 'end', values=(name, hotkeys, filename))
@@ -137,10 +147,7 @@ class RetroBoard(tk.Frame):
         item = self.audio_table.focus()
         if item:
             item = self.audio_table.item(item)
-            data, fs = soundfile.read(item['values'][2])
-            sounddevice.play(data, fs, device=self.primary_device.get())
-            if self.secondary_device_enable.get():
-                sounddevice.play(data, fs, device=self.secondary_device.get())
+            self.play_file(item['values'][2])
 
     def stop_button_callback(self):
         sounddevice.stop()
