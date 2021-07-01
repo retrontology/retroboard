@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import sounddevice
 from entryframe import EntryFrame
+import os.path
 
 class RetroBoard(tk.Frame):
 
@@ -42,8 +43,8 @@ class RetroBoard(tk.Frame):
         table_frame.rowconfigure(0, weight=1)
 
         # Audio clip table
-        table_headings = ['Sound Clip','HotKeys']
-        self.audio_table = ttk.Treeview(table_frame, show="headings", height=10, columns=table_headings)
+        table_headings = ['Sound Clip','HotKeys', 'path']
+        self.audio_table = ttk.Treeview(table_frame, show="headings", height=10, columns=table_headings, displaycolumns=table_headings[:2])
         self.audio_table.columnconfigure(0, weight=10)
         self.audio_table.columnconfigure(1, weight=1)
         self.audio_table.grid(column=0, row=0, sticky='nsew', in_=table_frame)
@@ -115,6 +116,10 @@ class RetroBoard(tk.Frame):
             self.secondary_device_menu.configure(state='normal')
         else:
             self.secondary_device_menu.configure(state='disabled')
+    
+    def add_to_table(self, filename, hotkeys=''):
+        name = os.path.basename(filename)
+        self.audio_table.insert('', 'end', values=(name, hotkeys, filename))
 
     def add_button_callback(self):
         EntryFrame(self)

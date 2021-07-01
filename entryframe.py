@@ -4,7 +4,7 @@ import tkinter.filedialog as filedialog
 
 class EntryFrame(tk.Toplevel):
 
-    def __init__(self, master=None):
+    def __init__(self, master=None, filename=None, hotkeys=None):
         super().__init__(master)
         self.master = master
         self.setup_widgets()
@@ -25,7 +25,7 @@ class EntryFrame(tk.Toplevel):
         browse_frame.grid(column=0, row=0, sticky='w')
         self.filename_var = tk.StringVar(popup_frame, 'None Selected', 'filename')
         tk.Label(browse_frame, text='Sound clip:').pack(side='left',pady=5)
-        tk.Button(browse_frame, text='Select', command=lambda: self.browse_files(self.filename_var)).pack(side='left')
+        tk.Button(browse_frame, text='Select', command=self.browse_files).pack(side='left')
         filename_label = tk.Label(file_frame, textvariable=self.filename_var)
         filename_label.grid(column=0, row=1, sticky='w')
         ttk.Separator(popup_frame, orient='horizontal').grid(column=0, row=1, sticky='ew', pady=5)
@@ -40,9 +40,19 @@ class EntryFrame(tk.Toplevel):
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
         # Done button
-        tk.Button(popup_frame, text='Done').grid(column=0, row=3, sticky='se')
+        tk.Button(popup_frame, text='Done', command=self.submit_new).grid(column=0, row=3, sticky='se')
     
-    def browse_files(self, filename_var):
+    def browse_files(self):
         filenames = filedialog.askopenfilenames()
         if len(filenames) == 1:
-            filename_var.set(filenames[0])
+            self.filename_var.set(filenames[0])
+        elif len(filenames) > 1:
+            for file in filenames:
+                self.master.add_to_table(file)
+            self.destroy()
+    
+    def submit_new(self):
+        filename = self.filename_var.get()
+        if filename and filename != 'None Selected':
+            self.master.add_to_table(filename)
+        self.destroy()
