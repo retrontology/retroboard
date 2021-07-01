@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import sounddevice
+import tkinter.filedialog as filedialog
 
 class retroboard(tk.Frame):
 
@@ -35,7 +36,7 @@ class retroboard(tk.Frame):
     def create_audio_table(self):
         # Top Level frame for table of audio clips
         table_frame = tk.Frame(self)
-        table_frame.grid(column=0, row=0, sticky='nsew', padx=8, pady=8)
+        table_frame.grid(column=0, row=0, sticky='nsew', padx=8, pady=5)
         self.rowconfigure(0, weight=1)
         table_frame.columnconfigure(0, weight=1)
         table_frame.rowconfigure(0, weight=1)
@@ -80,7 +81,7 @@ class retroboard(tk.Frame):
     def create_device_selection(self):
         # Device selection frame
         device_frame = tk.Frame(self)
-        device_frame.grid(column=0, row=2, sticky='nsew', padx=8, pady=8)
+        device_frame.grid(column=0, row=2, sticky='nsew', padx=8, pady=5)
         device_frame.columnconfigure(0, weight=1)
         
         # Get device info
@@ -109,16 +110,44 @@ class retroboard(tk.Frame):
         self.toggle_secondary_device_enable()
         secondary_device_enable_button.grid(column=1, row=0, sticky='nsew')
         
-    
     def toggle_secondary_device_enable(self):
         if self.secondary_device_enable.get():
             self.secondary_device_menu.configure(state='normal')
         else:
             self.secondary_device_menu.configure(state='disabled')
+    
+    def browse_files(self, filename_var):
+        filenames = filedialog.askopenfilenames()
+        if len(filenames) == 1:
+            filename_var.set(filenames[0])
 
     def add_button_callback(self):
+        # Create new window
         popup = tk.Toplevel()
+        popup.geometry('500x200')
         popup.grab_set()
+        popup_frame = tk.Frame(popup)
+        popup_frame.pack(padx=10, pady=10, fill='both')
+        popup_frame.columnconfigure(0, weight=1)
+
+        # Browse for file
+        file_frame = tk.Frame(popup_frame)
+        file_frame.grid(column=0, row=0, sticky='w')
+        browse_frame = tk.Frame(file_frame)
+        browse_frame.grid(column=0, row=0, sticky='w')
+        filename_var = tk.StringVar(popup_frame, 'None Selected', 'filename')
+        tk.Label(browse_frame, text='Sound clip:').pack(side='left')
+        tk.Button(browse_frame, text='Select', command=lambda: self.browse_files(filename_var)).pack(side='left')
+        filename_label = tk.Label(file_frame, textvariable=filename_var)
+        filename_label.grid(column=0, row=1, sticky='w')
+        ttk.Separator(popup_frame, orient='horizontal').grid(column=0, row=1, sticky='ew', pady=5)
+
+        # Hotkeys
+        hotkey_frame = tk.Frame(popup_frame)
+        hotkey_frame.grid(column=0, row=2, sticky='w')
+        hotkey_var = tk.StringVar(popup, '', 'hotkey_var')
+        tk.Label(hotkey_frame, text='HotKeys:').grid(column=0, row=0, sticky='w')
+        tk.Entry(hotkey_frame, state='disabled', textvariable=hotkey_var).grid(column=0, row=1, sticky='we')
 
     def remove_button_callback(self):
         pass
