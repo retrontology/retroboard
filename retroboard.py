@@ -139,6 +139,8 @@ class RetroBoard(tk.Frame):
             item = self.audio_table.item(item)
             data, fs = soundfile.read(item['values'][2])
             sounddevice.play(data, fs, device=self.primary_device.get())
+            if self.secondary_device_enable.get():
+                sounddevice.play(data, fs, device=self.secondary_device.get())
 
     def stop_button_callback(self):
         sounddevice.stop()
