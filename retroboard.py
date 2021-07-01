@@ -24,6 +24,7 @@ class retroboard(tk.Frame):
         # Top Level menubar
         self.menubar = tk.Menu(self.winfo_toplevel())
         self.winfo_toplevel().config(menu=self.menubar)
+
         # File Menu
         file_menu = tk.Menu(self.menubar)
         file_menu.add_command(label='Save', command=self.file_save_callback)
@@ -34,7 +35,7 @@ class retroboard(tk.Frame):
     def create_audio_table(self):
         # Top Level frame for table of audio clips
         table_frame = tk.Frame(self)
-        table_frame.grid(column=0, row=0, sticky='nsew')
+        table_frame.grid(column=0, row=0, sticky='nsew', padx=8, pady=8)
         self.rowconfigure(0, weight=1)
         table_frame.columnconfigure(0, weight=1)
         table_frame.rowconfigure(0, weight=1)
@@ -60,26 +61,26 @@ class retroboard(tk.Frame):
 
         # buttons that edit the table
         table_button_frame = tk.Frame(button_frame)
-        table_button_frame.pack(side='left')
+        table_button_frame.pack(side='left', padx=8, pady=8)
         add_button = tk.Button(table_button_frame, text='Add', command=self.add_button_callback)
-        add_button.grid(column=0, row=0, sticky='w', in_=table_button_frame)
+        add_button.grid(column=0, row=0, sticky='w', in_=table_button_frame, padx=5)
         remove_button = tk.Button(table_button_frame, text='Remove', command=self.remove_button_callback)
-        remove_button.grid(column=1, row=0, sticky='w', in_=table_button_frame)
+        remove_button.grid(column=1, row=0, sticky='w', in_=table_button_frame, padx=5)
         edit_button = tk.Button(table_button_frame, text='Edit', command=self.edit_button_callback)
-        edit_button.grid(column=2, row=0, sticky='w', in_=table_button_frame)
+        edit_button.grid(column=2, row=0, sticky='w', in_=table_button_frame, padx=5)
 
         # buttons for playback
         playback_button_frame = tk.Frame(button_frame)
-        playback_button_frame.pack(side='right')
+        playback_button_frame.pack(side='right', padx=8, pady=8)
         play_button = tk.Button(playback_button_frame, text='Play', command=self.play_button_callback)
-        play_button.grid(column=0, row=0, sticky='w', in_=playback_button_frame)
+        play_button.grid(column=0, row=0, sticky='w', in_=playback_button_frame, padx=8)
         stop_button = tk.Button(playback_button_frame, text='Stop All', command=self.stop_button_callback)
-        stop_button.grid(column=1, row=0, sticky='w', in_=playback_button_frame)
+        stop_button.grid(column=1, row=0, sticky='w', in_=playback_button_frame, padx=8)
 
     def create_device_selection(self):
         # Device selection frame
         device_frame = tk.Frame(self)
-        device_frame.grid(column=0, row=2, sticky='nsew')
+        device_frame.grid(column=0, row=2, sticky='nsew', padx=8, pady=8)
         device_frame.columnconfigure(0, weight=1)
         
         # Get device info
@@ -116,7 +117,8 @@ class retroboard(tk.Frame):
             self.secondary_device_menu.configure(state='disabled')
 
     def add_button_callback(self):
-        pass
+        popup = tk.Toplevel()
+        popup.grab_set()
 
     def remove_button_callback(self):
         pass
