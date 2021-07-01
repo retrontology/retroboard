@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import sounddevice
+import soundfile
 from entryframe import EntryFrame
 import os.path
 
@@ -131,10 +132,14 @@ class RetroBoard(tk.Frame):
         pass
 
     def play_button_callback(self):
-        pass
+        item = self.audio_table.focus()
+        if item:
+            item = self.audio_table.item(item)
+            data, fs = soundfile.read(item['values'][2])
+            sounddevice.play(data, fs, device=self.primary_device.get())
 
     def stop_button_callback(self):
-        pass
+        sounddevice.stop()
 
     def file_save_callback(self):
         pass
