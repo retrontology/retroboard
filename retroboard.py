@@ -61,7 +61,7 @@ class retroboard(tk.Frame):
 
         # buttons that edit the table
         table_button_frame = tk.Frame(button_frame)
-        table_button_frame.pack(side='left', padx=8, pady=8)
+        table_button_frame.pack(side='left', padx=8)
         add_button = tk.Button(table_button_frame, text='Add', command=self.add_button_callback)
         add_button.grid(column=0, row=0, sticky='w', in_=table_button_frame, padx=5)
         remove_button = tk.Button(table_button_frame, text='Remove', command=self.remove_button_callback)
@@ -71,7 +71,7 @@ class retroboard(tk.Frame):
 
         # buttons for playback
         playback_button_frame = tk.Frame(button_frame)
-        playback_button_frame.pack(side='right', padx=8, pady=8)
+        playback_button_frame.pack(side='right', padx=8)
         play_button = tk.Button(playback_button_frame, text='Play', command=self.play_button_callback)
         play_button.grid(column=0, row=0, sticky='w', in_=playback_button_frame, padx=8)
         stop_button = tk.Button(playback_button_frame, text='Stop All', command=self.stop_button_callback)
