@@ -126,7 +126,9 @@ class RetroBoard(tk.Frame):
         EntryFrame(self)
 
     def remove_button_callback(self):
-        pass
+        item = self.audio_table.focus()
+        if item:
+            self.audio_table.delete(item)
 
     def edit_button_callback(self):
         pass
