@@ -56,7 +56,7 @@ class EntryFrame(tk.Toplevel):
             self.filename_var.set(filenames[0])
         elif len(filenames) > 1:
             for file in filenames:
-                self.master.add_to_table(file)
+                self.master.add_entry(file)
             self.destroy()
     
     def submit(self):

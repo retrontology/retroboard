@@ -1,9 +1,11 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.filedialog as filedialog
 import sounddevice
 from audioentry import AudioEntry
 from entryframe import EntryFrame
-import os.path
+import os
+import json
 
 class RetroBoard(tk.Frame):
 
@@ -35,7 +37,7 @@ class RetroBoard(tk.Frame):
 
         # File Menu
         file_menu = tk.Menu(self.menubar, tearoff=0)
-        file_menu.add_command(label='Save', command=self.file_save_callback)
+        file_menu.add_command(label='Save As', command=self.file_save_as_callback)
         file_menu.add_command(label='Load', command=self.file_load_callback)
         file_menu.add_command(label='Exit', command=self.on_exit)
         self.menubar.add_cascade(label = "File", menu=file_menu)
@@ -172,11 +174,28 @@ class RetroBoard(tk.Frame):
         while len(self.playing) > 0:
             self.playing[0].stop()
 
-    def file_save_callback(self):
-        pass
+    def file_save_as_callback(self):
+        filename = filedialog.asksaveasfilename(initialfile='default.rbd')
+        self.save_file(filename)
 
     def file_load_callback(self):
-        pass
+        filename = filedialog.askopenfilename(initialfile='default.rbd')
+        self.load_file(filename)
+
+    def save_file(self, filename):
+        data = []
+        for iid in self.audio_table.get_children():
+            item = self.audio_table.item(iid)
+            data.append(item['values'].copy())
+        with open(filename, 'w') as outfile:
+            json.dump(data, outfile)
+    
+    def load_file(self, filename):
+        with open(filename, 'r') as infile:
+            data = json.load(infile)
+        self.audio_table.delete(*self.audio_table.get_children())
+        for d in data:
+            self.audio_table.insert('', 'end', None, values=d.copy())
 
 def main():
     root = tk.Tk()
