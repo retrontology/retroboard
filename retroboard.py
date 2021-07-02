@@ -1,9 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import sounddevice
-import pydub
-import pydub.playback
-import numpy
+from audioentry import AudioEntry
 from entryframe import EntryFrame
 import os.path
 
@@ -121,17 +119,10 @@ class RetroBoard(tk.Frame):
             self.secondary_device_menu.configure(state='disabled')
     
     def play_file(self, filename):
-        audio_file = pydub.AudioSegment.from_file(filename)
-        data = self.split_data_to_channels(audio_file.get_array_of_samples(), audio_file.channels)
-        sounddevice.play(data, audio_file.frame_rate, device=self.primary_device.get())
-        if self.secondary_device_enable.get():
-            sounddevice.play(data, audio_file.frame_rate, device=self.secondary_device.get())
-    
-    @staticmethod
-    def split_data_to_channels(data, channels):
-        data = numpy.array(data)
-        data = data.reshape(int(len(data)/channels), channels)
-        return(data)
+        AudioEntry(filename, self.get_devices()).play()
+
+    def get_devices(self):
+        return [self.primary_device.get(), self.secondary_device.get()]
     
     def add_to_table(self, filename, hotkeys=''):
         name = os.path.basename(filename)
