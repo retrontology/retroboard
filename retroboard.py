@@ -10,9 +10,14 @@ class RetroBoard(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
+        self.playing = []
         self.pack(fill='both', expand=True)
         self.columnconfigure(0, weight=1)
         self.setup_widgets()
+        self.add_tests()
+    
+    def add_tests(self):
+        self.audio_table.insert('', 'end', None, values=('test.mp3', '', 'test.mp3'))
 
     def on_exit(self):
         self.winfo_toplevel().destroy()
@@ -119,10 +124,15 @@ class RetroBoard(tk.Frame):
             self.secondary_device_menu.configure(state='disabled')
     
     def play_file(self, filename):
-        AudioEntry(filename, self.get_devices()).play()
+        af = AudioEntry(filename, self)
+        af.play()
+        self.playing.append(af)
 
     def get_devices(self):
-        return [self.primary_device.get(), self.secondary_device.get()]
+        out = [self.primary_device.get()]
+        if self.secondary_device_enable.get():
+            out.append(self.secondary_device.get())
+        return out
     
     def add_to_table(self, filename, hotkeys=''):
         name = os.path.basename(filename)
@@ -146,7 +156,11 @@ class RetroBoard(tk.Frame):
             self.play_file(item['values'][2])
 
     def stop_button_callback(self):
-        sounddevice.stop()
+        self.stop_all()
+    
+    def stop_all(self):
+        while len(self.playing) > 0:
+            self.playing[0].stop()
 
     def file_save_callback(self):
         pass
