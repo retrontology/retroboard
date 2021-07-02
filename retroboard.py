@@ -134,9 +134,15 @@ class RetroBoard(tk.Frame):
             out.append(self.secondary_device.get())
         return out
     
-    def add_to_table(self, filename, hotkeys=''):
+    def add_entry(self, filename, hotkeys=''):
         name = os.path.basename(filename)
         self.audio_table.insert('', 'end', values=(name, hotkeys, filename))
+    
+    def edit_entry(self, iid, filename, hotkeys=''):
+        name = os.path.basename(filename)
+        self.audio_table.set(iid, column='Sound Clip', value=name)
+        self.audio_table.set(iid, column='HotKeys', value=hotkeys)
+        self.audio_table.set(iid, column='path', value=filename)
 
     def add_button_callback(self):
         EntryFrame(self)
@@ -147,7 +153,11 @@ class RetroBoard(tk.Frame):
             self.audio_table.delete(item)
 
     def edit_button_callback(self):
-        pass
+        index = self.audio_table.focus()
+        if index:
+            item = self.audio_table.item(index)
+            print(item)
+            EntryFrame(self, item['values'][2], item['values'][1], index)
 
     def play_button_callback(self):
         item = self.audio_table.focus()

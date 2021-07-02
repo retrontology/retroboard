@@ -4,11 +4,21 @@ import tkinter.filedialog as filedialog
 
 class EntryFrame(tk.Toplevel):
 
-    def __init__(self, master=None, filename=None, hotkeys=None):
+    def __init__(self, master=None, filename=None, hotkeys=None, iid=None):
         super().__init__(master)
         self.master = master
+        self.iid = iid
+        self.setup_variables(filename, hotkeys)
         self.setup_widgets()
     
+    def setup_variables(self, filename=None, hotkeys=None):
+        if not filename:
+            filename = 'None Selected'
+        if not hotkeys:
+            hotkeys = ''
+        self.filename_var = tk.StringVar(self, filename, 'filename')
+        self.hotkey_var = tk.StringVar(self, hotkeys, 'hotkey_var')
+
     def setup_widgets(self):
         # Create new window
         self.geometry('500x170')
@@ -23,7 +33,6 @@ class EntryFrame(tk.Toplevel):
         file_frame.grid(column=0, row=0, sticky='w')
         browse_frame = tk.Frame(file_frame)
         browse_frame.grid(column=0, row=0, sticky='w')
-        self.filename_var = tk.StringVar(popup_frame, 'None Selected', 'filename')
         tk.Label(browse_frame, text='Sound clip:').pack(side='left',pady=5)
         tk.Button(browse_frame, text='Select', command=self.browse_files).pack(side='left')
         filename_label = tk.Label(file_frame, textvariable=self.filename_var)
@@ -34,13 +43,12 @@ class EntryFrame(tk.Toplevel):
         hotkey_frame = tk.Frame(popup_frame)
         hotkey_frame.columnconfigure(0, weight=1)
         hotkey_frame.grid(column=0, row=2, sticky='we')
-        self.hotkey_var = tk.StringVar(self, '', 'hotkey_var')
         tk.Label(hotkey_frame, text='HotKeys:').grid(column=0, row=0, sticky='w')
         tk.Entry(hotkey_frame, state='disabled', textvariable=self.hotkey_var).grid(column=0, row=1, sticky='we')
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
         # Done button
-        tk.Button(popup_frame, text='Done', command=self.submit_new).grid(column=0, row=3, sticky='se')
+        tk.Button(popup_frame, text='Done', command=self.submit).grid(column=0, row=3, sticky='se')
     
     def browse_files(self):
         filenames = filedialog.askopenfilenames()
@@ -51,9 +59,11 @@ class EntryFrame(tk.Toplevel):
                 self.master.add_to_table(file)
             self.destroy()
     
-    def submit_new(self):
+    def submit(self):
         filename = self.filename_var.get()
         hotkeys = self.hotkey_var.get()
-        if filename and filename != 'None Selected':
-            self.master.add_to_table(filename, hotkeys)
+        if self.iid:
+            self.master.edit_entry(self.iid, filename, hotkeys)
+        elif filename and filename != 'None Selected':
+            self.master.add_entry(filename, hotkeys)
         self.destroy()
