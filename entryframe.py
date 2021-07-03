@@ -11,6 +11,7 @@ class EntryFrame(tk.Toplevel):
         self.iid = iid
         self.setup_variables(filename, hotkeys)
         self.setup_widgets()
+        self.setup_binds()
     
     def setup_variables(self, filename=None, hotkeys=None):
         if not filename:
@@ -25,6 +26,7 @@ class EntryFrame(tk.Toplevel):
         self.geometry('500x170')
         self.resizable(width=False, height=False)
         self.grab_set()
+        self.focus_force()
         popup_frame = tk.Frame(self)
         popup_frame.pack(padx=10, pady=10, fill='both')
         popup_frame.columnconfigure(0, weight=1)
@@ -49,8 +51,12 @@ class EntryFrame(tk.Toplevel):
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
         # Done button
-        tk.Button(popup_frame, text='Done', command=self.submit).grid(column=0, row=3, sticky='se')
+        done = tk.Button(popup_frame, text='Done', command=self.submit)
+        done.grid(column=0, row=3, sticky='se')
     
+    def setup_binds(self):
+        self.bind('<Return>', lambda x: self.submit())
+
     def browse_files(self):
         filenames = filedialog.askopenfilenames()
         if len(filenames) == 1:

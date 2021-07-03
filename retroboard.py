@@ -16,10 +16,10 @@ class RetroBoard(tk.Frame):
         self.pack(fill='both', expand=True)
         self.columnconfigure(0, weight=1)
         self.setup_widgets()
-        self.add_tests()
+        self.setup_binds()
     
-    def add_tests(self):
-        self.audio_table.insert('', 'end', None, values=('test.mp3', '', 'test.mp3'))
+    def setup_binds(self):
+        self.winfo_toplevel().bind('<Return>', self.enter_callback)
 
     def on_exit(self):
         self.winfo_toplevel().destroy()
@@ -145,6 +145,14 @@ class RetroBoard(tk.Frame):
         self.audio_table.set(iid, column='Sound Clip', value=name)
         self.audio_table.set(iid, column='HotKeys', value=hotkeys)
         self.audio_table.set(iid, column='path', value=filename)
+    
+    def enter_callback(self, somevar):
+        item = self.audio_table.focus()
+        if item:
+            item = self.audio_table.item(item)
+            EntryFrame(self, item['values'][2], item['values'][1], item)
+        else:
+            EntryFrame(self)
 
     def add_button_callback(self):
         EntryFrame(self)
@@ -158,7 +166,6 @@ class RetroBoard(tk.Frame):
         index = self.audio_table.focus()
         if index:
             item = self.audio_table.item(index)
-            print(item)
             EntryFrame(self, item['values'][2], item['values'][1], index)
 
     def play_button_callback(self):
