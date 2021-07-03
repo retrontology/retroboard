@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
+from hotkeyentry import HotkeyEntry
 
 class EntryFrame(tk.Toplevel):
 
@@ -44,7 +45,7 @@ class EntryFrame(tk.Toplevel):
         hotkey_frame.columnconfigure(0, weight=1)
         hotkey_frame.grid(column=0, row=2, sticky='we')
         tk.Label(hotkey_frame, text='HotKeys:').grid(column=0, row=0, sticky='w')
-        tk.Entry(hotkey_frame, state='disabled', textvariable=self.hotkey_var).grid(column=0, row=1, sticky='we')
+        HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var).grid(column=0, row=1, sticky='we')
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
         # Done button
