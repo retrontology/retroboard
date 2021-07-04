@@ -47,7 +47,8 @@ class EntryFrame(tk.Toplevel):
         hotkey_frame.columnconfigure(0, weight=1)
         hotkey_frame.grid(column=0, row=2, sticky='we')
         tk.Label(hotkey_frame, text='HotKeys:').grid(column=0, row=0, sticky='w')
-        self.hotkey_entry = HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var).grid(column=0, row=1, sticky='we')
+        self.hotkey_entry = HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var)
+        self.hotkey_entry.grid(column=0, row=1, sticky='we')
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
         # Done button
@@ -56,6 +57,7 @@ class EntryFrame(tk.Toplevel):
     
     def setup_binds(self):
         self.bind('<Return>', lambda x: self.submit())
+        self.bind('<ButtonRelease-3>', lambda x: self.hotkey_entry.stop())
 
     def browse_files(self):
         filenames = filedialog.askopenfilenames()
@@ -67,8 +69,7 @@ class EntryFrame(tk.Toplevel):
             self.destroy()
     
     def submit(self):
-        if self.hotkey_entry.capture:
-            self.hotkey_entry.capture = False
+        self.hotkey_entry.stop()
         filename = self.filename_var.get()
         hotkeys = self.hotkey_var.get()
         if self.iid:
