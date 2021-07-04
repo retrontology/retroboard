@@ -2,12 +2,14 @@ import tkinter as tk
 from threading import Thread
 from time import sleep
 from pynput import keyboard
+from enum import Enum
 
 class HotkeyEntry(tk.Entry):
     def __init__(self, master=None, cnf={}, **kw):
         kw['state'] = 'disabled'
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
+        self.hotkey_combo = KeyCombo()
         self.capture = False
         self.capture_process = None
         self.key_pressed = None
@@ -26,7 +28,7 @@ class HotkeyEntry(tk.Entry):
     def capture_hotkeys(self):
         self.capture = True
         self.config({"disabledbackground": "deep sky blue"})
-        listener = keyboard.Listener(on_press=self.key_callback, on_release=self.key_callback)
+        listener = keyboard.Listener(on_press=self.hotkey_combo.key_press_callback, on_release=self.hotkey_combo.key_release_callback)
         listener.start()
         while self.capture:
             sleep(1)
@@ -37,11 +39,13 @@ class HotkeyEntry(tk.Entry):
     def clear_hotkeys(self):
         pass
 
-    def key_callback(self, key:keyboard.KeyCode):
-        
-        """ if key.type == 'KeyPress':
-            if not self.key_pressed:
-                self.key_pressed = key.keycode
-        elif key.type == 'KeyRelease':
-            if self.key_pressed == key.keycode:
-                pass """
+class KeyCombo():
+    
+    def __init__(self, textvar = None):
+        pass
+
+    def key_press_callback(self, key):
+        pass
+
+    def key_release_callback(self, key):
+        pass

@@ -47,7 +47,7 @@ class EntryFrame(tk.Toplevel):
         hotkey_frame.columnconfigure(0, weight=1)
         hotkey_frame.grid(column=0, row=2, sticky='we')
         tk.Label(hotkey_frame, text='HotKeys:').grid(column=0, row=0, sticky='w')
-        HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var).grid(column=0, row=1, sticky='we')
+        self.hotkey_entry = HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var).grid(column=0, row=1, sticky='we')
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
         # Done button
@@ -67,6 +67,8 @@ class EntryFrame(tk.Toplevel):
             self.destroy()
     
     def submit(self):
+        if self.hotkey_entry.capture:
+            self.hotkey_entry.capture = False
         filename = self.filename_var.get()
         hotkeys = self.hotkey_var.get()
         if self.iid:
