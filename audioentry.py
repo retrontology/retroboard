@@ -35,6 +35,9 @@ class AudioEntry():
     
     def playback_finished(self):
         self.parent.playing.remove(self)
+        self.data = None
+        self.segment = None
+        del self
 
     def play(self):
         if not self.segment or not self.data:
@@ -47,9 +50,3 @@ class AudioEntry():
     def stop(self):
         for stream in self.streams:
             stream.stop()
-
-    """ def play(self, devices:list):
-        if not self.segment or not self.data:
-            self.load_audio()
-        for device in devices:
-            sounddevice.play(self.data, self.segment.frame_rate, device=device) """

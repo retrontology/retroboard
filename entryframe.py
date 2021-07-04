@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
 from hotkeyentry import HotkeyEntry
+from pynput.keyboard import HotKey
 
 class EntryFrame(tk.Toplevel):
 
@@ -57,6 +58,7 @@ class EntryFrame(tk.Toplevel):
     
     def setup_binds(self):
         self.bind('<Return>', lambda x: self.submit())
+        self.bind('<ButtonRelease-1>', lambda x: self.hotkey_entry.stop())
         self.bind('<ButtonRelease-3>', lambda x: self.hotkey_entry.stop())
 
     def browse_files(self):
@@ -71,9 +73,11 @@ class EntryFrame(tk.Toplevel):
     def submit(self):
         self.hotkey_entry.stop()
         filename = self.filename_var.get()
-        hotkeys = self.hotkey_var.get()
+        hotkeys_str = self.hotkey_var.get()
+        hotkey = HotKey(self.hotkey_entry.keys_stored, None)
         if self.iid:
-            self.master.edit_entry(self.iid, filename, hotkeys)
+            self.master.edit_entry(self.iid, filename, hotkeys_str, hotkey)
         elif filename and filename != 'None Selected':
-            self.master.add_entry(filename, hotkeys)
+            self.iid = self.master.add_entry(filename, hotkeys_str, hotkey)
+        hotkey._on_activate = lambda: self.master.play_entry(self.iid)
         self.destroy()

@@ -3,7 +3,6 @@ from threading import Thread
 from time import sleep
 from pynput import keyboard, mouse
 from enum import Enum
-from keycombo import KeyCombo
 
 class HotkeyEntry(tk.Entry):
     def __init__(self, master=None, cnf={}, **kw):
@@ -11,7 +10,8 @@ class HotkeyEntry(tk.Entry):
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
         self.hotkey_var: tk.StringVar = kw['textvariable']
-        self.hotkey_combo = KeyCombo(kw['textvariable'])
+        self.keys_pressed = set()
+        self.keys_stored = set()
         self.capture = False
         self.capture_process = None
         self.bind('<ButtonRelease-1>', self.left_click_callback)
@@ -33,15 +33,47 @@ class HotkeyEntry(tk.Entry):
     def capture_hotkeys(self):
         self.capture = True
         self.config({"disabledbackground": "deep sky blue"})
-        listeners = []
-        listeners.append(keyboard.Listener(on_press=self.hotkey_combo.key_press_callback, on_release=self.hotkey_combo.key_release_callback))
-        for listener in listeners: listener.start()
+        listener = keyboard.Listener(on_press=self.key_press_callback, on_release=self.key_release_callback)
+        listener.start()
         while self.capture:
             sleep(1)
-        for listener in listeners: listener.stop()
+        listener.stop()
         self.capture = False
         if self.winfo_exists():
             self.config({"disabledbackground": "light gray"})
 
     def clear_hotkeys(self):
         self.hotkey_var.set('')
+    
+    def key_press_callback(self, key):
+        if not key in self.keys_pressed and key in self.keys_stored:
+            self.keys_stored = self.keys_pressed.copy()
+        self.keys_pressed.add(key)
+        for key in self.keys_pressed:
+            if not key in self.keys_stored:
+                self.keys_stored = self.keys_pressed.copy()
+                break
+        self.hotkey_var.set(self.set_to_string(self.keys_stored))
+
+    def key_release_callback(self, key):
+        if key in self.keys_pressed:
+            self.keys_pressed.remove(key)
+        self.hotkey_var.set(self.set_to_string(self.keys_stored))
+    
+    def get_hotkey(self, on_activate):
+        if len(self.keys_stored) == 0:
+            return None
+        else:
+            return keyboard.HotKey(self.keys_stored, on_activate)
+        
+    @staticmethod
+    def set_to_string(keys: set):
+        out = ''
+        for key in keys:
+            if out != '':
+                out += '+'
+            if type(key) == keyboard.Key:
+                out += f'<{key._name_}>'
+            elif type(key) == keyboard.KeyCode:
+                out += key.char
+        return out

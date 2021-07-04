@@ -4,8 +4,12 @@ import tkinter.filedialog as filedialog
 import sounddevice
 from audioentry import AudioEntry
 from entryframe import EntryFrame
+from hotkeytree import HotKeyTree
 import os
 import json
+from threading import Thread
+
+DEFAULT_SAVE = 'default.rbd'
 
 class RetroBoard(tk.Frame):
 
@@ -52,8 +56,8 @@ class RetroBoard(tk.Frame):
 
         # Audio clip table
         table_headings = ['Sound Clip','HotKeys', 'path']
-        self.audio_table = ttk.Treeview(table_frame, show="headings", height=10, columns=table_headings, displaycolumns=table_headings[:2])
-        self.audio_table.columnconfigure(0, weight=10)
+        self.audio_table = HotKeyTree(table_frame, show="headings", height=10, columns=table_headings, displaycolumns=table_headings[:2])
+        self.audio_table.columnconfigure(0, weight=1)
         self.audio_table.columnconfigure(1, weight=1)
         self.audio_table.grid(column=0, row=0, sticky='nsew', in_=table_frame)
         for column in table_headings:
@@ -125,9 +129,10 @@ class RetroBoard(tk.Frame):
         else:
             self.secondary_device_menu.configure(state='disabled')
     
-    def play_file(self, filename):
+    def play_entry(self, item):
+        filename = self.audio_table.item(item)['values'][2]
         af = AudioEntry(filename, self)
-        af.play()
+        Thread(target=af.play).start()
         self.playing.append(af)
 
     def get_devices(self):
@@ -136,15 +141,17 @@ class RetroBoard(tk.Frame):
             out.append(self.secondary_device.get())
         return out
     
-    def add_entry(self, filename, hotkeys=''):
+    def add_entry(self, filename, hotkeys_str='', hotkey=None):
         name = os.path.basename(filename)
-        self.audio_table.insert('', 'end', values=(name, hotkeys, filename))
+        return self.audio_table.insert('', 'end', values=(name, hotkeys_str, filename), hotkey=hotkey)
     
-    def edit_entry(self, iid, filename, hotkeys=''):
+    def edit_entry(self, iid, filename, hotkeys_str='', hotkey=None):
         name = os.path.basename(filename)
         self.audio_table.set(iid, column='Sound Clip', value=name)
-        self.audio_table.set(iid, column='HotKeys', value=hotkeys)
+        self.audio_table.set(iid, column='HotKeys', value=hotkeys_str)
         self.audio_table.set(iid, column='path', value=filename)
+        self.audio_table.set_hotkey(iid, hotkey)
+        return iid
     
     def enter_callback(self, somevar):
         item = self.audio_table.focus()
@@ -171,8 +178,7 @@ class RetroBoard(tk.Frame):
     def play_button_callback(self):
         item = self.audio_table.focus()
         if item:
-            item = self.audio_table.item(item)
-            self.play_file(item['values'][2])
+            self.play_entry(item)
 
     def stop_button_callback(self):
         self.stop_all()
@@ -182,11 +188,11 @@ class RetroBoard(tk.Frame):
             self.playing[0].stop()
 
     def file_save_as_callback(self):
-        filename = filedialog.asksaveasfilename(initialfile='default.rbd')
+        filename = filedialog.asksaveasfilename(initialfile=DEFAULT_SAVE)
         self.save_file(filename)
 
     def file_load_callback(self):
-        filename = filedialog.askopenfilename(initialfile='default.rbd')
+        filename = filedialog.askopenfilename(initialfile=DEFAULT_SAVE)
         self.load_file(filename)
 
     def save_file(self, filename):
