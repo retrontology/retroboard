@@ -228,7 +228,11 @@ class RetroBoard(tk.Tk):
         data = []
         for iid in self.audio_table.get_children():
             item = self.audio_table.item(iid).copy()
-            data.append((item['values'].copy(), item['hotkey']._keys.copy()))
+            if item['hotkey']:
+                hotkey = item['hotkey']._keys.copy()
+            else:
+                hotkey = None
+            data.append((item['values'].copy(), hotkey))
         with open(filename, 'wb') as outfile:
             pickle.dump(data, outfile)
         self.savefile.set(filename)
@@ -238,7 +242,11 @@ class RetroBoard(tk.Tk):
             data = pickle.load(infile)
         self.audio_table.clear()
         for d in data:
-            self.audio_table.insert('', 'end', None, HotKey(d[1], None), values=d[0].copy())
+            if d[1]:
+                hotkey = HotKey(d[1], None)
+            else:
+                hotkey = None
+            self.audio_table.insert('', 'end', None, hotkey, values=d[0].copy())
     
     def load_default_file(self):
         default_file = self.savefile.get()
