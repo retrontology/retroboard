@@ -48,9 +48,12 @@ class HotKeyTree(Treeview):
             self._listeners[iid] = None
     
     def remove_hotkey(self, iid):
-        self._listeners[iid].stop()
-        self._listeners.pop(iid)
-        self._hotkeys.pop(iid)
+        if iid in self._listeners:
+            if self._listeners[iid] is not None:
+                self._listeners[iid].stop()
+            self._listeners.pop(iid)
+        if iid in self._hotkeys:
+            self._hotkeys.pop(iid)
 
     def for_canonical(self, f, iid):
         return lambda k: f(self._listeners[iid].canonical(k))

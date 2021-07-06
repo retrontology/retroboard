@@ -28,6 +28,7 @@ class RetroBoard(tk.Tk):
         self.load_default_file()
     
     def setup_binds(self):
+        self.bind('<Control-s>', lambda x: self.file_save_callback())
         self.bind('<Return>', self.enter_callback)
         self.bind('<KP_Enter>', self.enter_callback)
     
