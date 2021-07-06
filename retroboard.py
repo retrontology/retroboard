@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import tkinter.filedialog as filedialog
 import sounddevice
 from audioentry import AudioEntry
@@ -18,6 +19,7 @@ class RetroBoard(tk.Tk):
         self.geometry("500x600")
         self.title('retroboard')
         self.playing = []
+        self.setup_variables()
         self.setup_widgets()
         self.setup_binds()
         self.load_default_file()
@@ -25,6 +27,15 @@ class RetroBoard(tk.Tk):
     def setup_binds(self):
         self.bind('<Return>', self.enter_callback)
         self.bind('<KP_Enter>', self.enter_callback)
+    
+    def setup_variables(self):
+        devices = sounddevice.query_devices()
+        device_names = [f'{i}. {x["name"]}' for i, x in enumerate(devices)]
+        odev = sounddevice._get_device_id(sounddevice.default.device['output'], 'output')
+        default_device = device_names[odev]
+        self.primary_device = tk.StringVar(self, default_device, 'primary_device')
+        self.secondary_device = tk.StringVar(self, default_device, 'secondary_device')
+        self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
     def on_exit(self):
         self.destroy()
@@ -104,29 +115,28 @@ class RetroBoard(tk.Tk):
         
         # Get device info
         devices = sounddevice.query_devices()
-        device_names = [x['name'] for x in devices]
-        default_device = sounddevice.query_devices(kind='output')['name']
+        device_names = [f'{i}. {x["name"]}' for i, x in enumerate(devices)]
 
         # Primary output
         primary_device_label = tk.Label(device_frame, text='Primary Output Device')
         primary_device_label.grid(column=0, row=0, sticky='w')
-        self.primary_device = tk.StringVar(self, default_device, 'primary_device')
-        primary_device_menu = tk.OptionMenu(device_frame, self.primary_device, *device_names)
+        primary_device_menu = ttk.Combobox(device_frame, textvariable=self.primary_device, values=device_names)
         primary_device_menu.grid(column=0, row=1, sticky='nsew', in_=device_frame)
 
         # Secondary output
         secondary_device_label = tk.Label(device_frame, text='Secondary Output Device')
         secondary_device_label.grid(column=0, row=2, sticky='w')
-        self.secondary_device = tk.StringVar(self, default_device, 'secondary_device')
         secondary_device_frame = tk.Frame(device_frame)
         secondary_device_frame.columnconfigure(0, weight=1)
         secondary_device_frame.grid(column=0, row=3, sticky='nsew', in_=device_frame)
-        self.secondary_device_menu = tk.OptionMenu(secondary_device_frame, self.secondary_device, *device_names)
+        self.secondary_device_menu = ttk.Combobox(secondary_device_frame, textvariable=self.secondary_device, values=device_names)
         self.secondary_device_menu.grid(column=0, row=0, sticky='nsew')
-        self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
         secondary_device_enable_button = tk.Checkbutton(secondary_device_frame, text='Use', variable=self.secondary_device_enable, command=self.toggle_secondary_device_enable)
         self.toggle_secondary_device_enable()
         secondary_device_enable_button.grid(column=1, row=0, sticky='nsew')
+    
+    def testmenu(self, out):
+        print(out)
         
     def toggle_secondary_device_enable(self):
         if self.secondary_device_enable.get():
@@ -141,9 +151,9 @@ class RetroBoard(tk.Tk):
         self.playing.append(af)
 
     def get_devices(self):
-        out = [self.primary_device.get()]
+        out = [int(self.primary_device.get().split('.', 1)[0])]
         if self.secondary_device_enable.get():
-            out.append(self.secondary_device.get())
+            out.append(int(self.secondary_device.get().split('.', 1)[0]))
         return out
     
     def add_entry(self, filename, hotkeys_str='', hotkey=None):
