@@ -59,6 +59,7 @@ class EntryWindow(tk.Toplevel):
     
     def setup_binds(self):
         self.bind('<Return>', lambda x: self.submit())
+        self.bind('<KP_Enter>', lambda x: self.submit())
 
     def browse_files(self):
         filenames = filedialog.askopenfilenames()

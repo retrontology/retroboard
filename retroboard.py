@@ -19,12 +19,14 @@ class RetroBoard(tk.Tk):
         self.playing = []
         self.setup_widgets()
         self.setup_binds()
+        self.load_default_file()
     
     def setup_binds(self):
-        self.winfo_toplevel().bind('<Return>', self.enter_callback)
+        self.bind('<Return>', self.enter_callback)
+        self.bind('<KP_Enter>', self.enter_callback)
 
     def on_exit(self):
-        self.winfo_toplevel().destroy()
+        self.destroy()
 
     def setup_widgets(self):
         topframe = tk.Frame()
@@ -212,6 +214,12 @@ class RetroBoard(tk.Tk):
         self.audio_table.delete(*self.audio_table.get_children())
         for d in data:
             self.audio_table.insert('', 'end', None, d[1], values=d[0].copy())
+    
+    def load_default_file(self):
+        dir = os.path.dirname(os.path.abspath(__file__))
+        default_file = os.path.join(dir, DEFAULT_SAVE)
+        if os.path.isfile(default_file):
+            self.load_file(default_file)
     
     def error(self, message):
         ErrorWindow(message, self)
