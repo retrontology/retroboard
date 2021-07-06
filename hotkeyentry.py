@@ -14,8 +14,8 @@ class HotkeyEntry(tk.Entry):
         self.keys_stored = set()
         self.capture = False
         self.capture_process = None
-        self.bind('<ButtonRelease-1>', self.left_click_callback)
-        self.bind('<ButtonRelease-3>', self.right_click_callback)
+        self.bind('<ButtonRelease-1>', self.left_click_callback, '+')
+        self.bind('<ButtonRelease-3>', self.right_click_callback, '+')
     
     def left_click_callback(self, key):
         if not self.capture:
@@ -35,11 +35,15 @@ class HotkeyEntry(tk.Entry):
         self.config({"disabledbackground": "deep sky blue"})
         listener = keyboard.Listener(on_press=self.key_press_callback, on_release=self.key_release_callback)
         listener.start()
+        binds = [self.winfo_toplevel().bind('<ButtonRelease-1>', lambda x: self.stop(), '+'),
+                 self.winfo_toplevel().bind('<ButtonRelease-3>', lambda x: self.stop(), '+')]
         while self.capture:
-            sleep(1)
+            sleep(.1)
         listener.stop()
         self.capture = False
         if self.winfo_exists():
+            self.winfo_toplevel().unbind('<ButtonRelease-1>', binds[0])
+            self.winfo_toplevel().unbind('<ButtonRelease-3>', binds[1])
             self.config({"disabledbackground": "light gray"})
 
     def clear_hotkeys(self):
@@ -60,12 +64,13 @@ class HotkeyEntry(tk.Entry):
             self.keys_pressed.remove(key)
         self.hotkey_var.set(self.set_to_string(self.keys_stored))
     
-    def get_hotkey(self, on_activate):
+    def get_hotkey(self, on_activate=None):
         if len(self.keys_stored) == 0:
             return None
         else:
-            return keyboard.HotKey(self.keys_stored, on_activate)
-        
+            out = keyboard.HotKey(self.keys_stored, on_activate)
+            return out
+    
     @staticmethod
     def set_to_string(keys: set):
         out = ''

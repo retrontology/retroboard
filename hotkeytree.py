@@ -36,11 +36,10 @@ class HotKeyTree(Treeview):
     def set_hotkey(self, iid, hotkey):
         if iid in self._hotkeys:
             self.remove_hotkey(iid)
-        if hotkey._on_activate is None:
-            top = self.winfo_toplevel()
-            hotkey._on_activate = lambda: top.play_entry(iid)
         self._hotkeys[iid] = hotkey
         if hotkey != None:
+            if hotkey._on_activate is None:
+                hotkey._on_activate = lambda: self.winfo_toplevel().play_entry(iid)
             self._listeners[iid] = keyboard.Listener(on_press=self.for_canonical(self._hotkeys[iid].press, iid), on_release=self.for_canonical(self._hotkeys[iid].release, iid))
             self._listeners[iid].start()
         else:

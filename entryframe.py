@@ -24,12 +24,11 @@ class EntryFrame(tk.Toplevel):
 
     def setup_widgets(self):
         # Create new window
-        self.geometry('500x250')
-        #self.resizable(width=False, height=False)
+        self.minsize(500,160)
         self.grab_set()
         self.focus_force()
         popup_frame = tk.Frame(self)
-        popup_frame.pack(padx=10, pady=10, fill='both')
+        popup_frame.pack(padx=10, pady=10, fill='both', expand=True)
         popup_frame.columnconfigure(0, weight=1)
 
         # Browse for file
@@ -55,11 +54,12 @@ class EntryFrame(tk.Toplevel):
         # Done button
         done = tk.Button(popup_frame, text='Done', command=self.submit)
         done.grid(column=0, row=3, sticky='se')
+
+        # Lock size
+        self.resizable(width=False, height=False)
     
     def setup_binds(self):
         self.bind('<Return>', lambda x: self.submit())
-        self.bind('<ButtonRelease-1>', lambda x: self.hotkey_entry.stop())
-        self.bind('<ButtonRelease-3>', lambda x: self.hotkey_entry.stop())
 
     def browse_files(self):
         filenames = filedialog.askopenfilenames()
@@ -73,8 +73,11 @@ class EntryFrame(tk.Toplevel):
     def submit(self):
         self.hotkey_entry.stop()
         filename = self.filename_var.get()
-        hotkeys_str = self.hotkey_var.get()
-        hotkey = HotKey(self.hotkey_entry.keys_stored, None)
+        hotkey = self.hotkey_entry.get_hotkey()
+        if hotkey is not None:
+            hotkeys_str = self.hotkey_entry.set_to_string(hotkey._keys)
+        else:
+            hotkeys_str = ''
         if self.iid:
             self.master.edit_entry(self.iid, filename, hotkeys_str, hotkey)
         elif filename and filename != 'None Selected':
