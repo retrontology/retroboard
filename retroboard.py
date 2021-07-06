@@ -6,19 +6,18 @@ from audioentry import AudioEntry
 from entryframe import EntryFrame
 from hotkeytree import HotKeyTree
 import os
-import json
+import pickle
 from threading import Thread
 
 DEFAULT_SAVE = 'default.rbd'
 
-class RetroBoard(tk.Frame):
+class RetroBoard(tk.Tk):
 
     def __init__(self, master=None):
         super().__init__(master)
-        self.master = master
+        self.geometry("500x600")
+        self.title('retroboard')
         self.playing = []
-        self.pack(fill='both', expand=True)
-        self.columnconfigure(0, weight=1)
         self.setup_widgets()
         self.setup_binds()
     
@@ -29,15 +28,19 @@ class RetroBoard(tk.Frame):
         self.winfo_toplevel().destroy()
 
     def setup_widgets(self):
+        topframe = tk.Frame()
+        topframe.pack(fill='both', expand=True)
+        topframe.columnconfigure(0, weight=1)
+        topframe.rowconfigure(0, weight=1)
         self.create_menu()
-        self.create_audio_table()
-        self.create_buttons()
-        self.create_device_selection()
+        self.create_audio_table(topframe)
+        self.create_buttons(topframe)
+        self.create_device_selection(topframe)
 
     def create_menu(self):
         # Top Level menubar
-        self.menubar = tk.Menu(self.winfo_toplevel())
-        self.winfo_toplevel().config(menu=self.menubar)
+        self.menubar = tk.Menu(self)
+        self.config(menu=self.menubar)
 
         # File Menu
         file_menu = tk.Menu(self.menubar, tearoff=0)
@@ -46,9 +49,9 @@ class RetroBoard(tk.Frame):
         file_menu.add_command(label='Exit', command=self.on_exit)
         self.menubar.add_cascade(label = "File", menu=file_menu)
 
-    def create_audio_table(self):
+    def create_audio_table(self, frame):
         # Top Level frame for table of audio clips
-        table_frame = tk.Frame(self)
+        table_frame = tk.Frame(frame)
         table_frame.grid(column=0, row=0, sticky='nsew', padx=8, pady=5)
         self.rowconfigure(0, weight=1)
         table_frame.columnconfigure(0, weight=1)
@@ -68,9 +71,9 @@ class RetroBoard(tk.Frame):
         self.audio_table.configure(yscrollcommand=scrollbar.set)
         scrollbar.grid(column=1, row=0, sticky='ns', in_=table_frame)
     
-    def create_buttons(self):
+    def create_buttons(self, frame):
         # Top level button frame
-        button_frame = tk.Frame(self)
+        button_frame = tk.Frame(frame)
         button_frame.grid(column=0, row=1, sticky='nsew')
 
         # buttons that edit the table
@@ -91,9 +94,9 @@ class RetroBoard(tk.Frame):
         stop_button = tk.Button(playback_button_frame, text='Stop All', command=self.stop_button_callback)
         stop_button.grid(column=1, row=0, sticky='w', in_=playback_button_frame, padx=8)
 
-    def create_device_selection(self):
+    def create_device_selection(self, frame):
         # Device selection frame
-        device_frame = tk.Frame(self)
+        device_frame = tk.Frame(frame)
         device_frame.grid(column=0, row=2, sticky='nsew', padx=8, pady=5)
         device_frame.columnconfigure(0, weight=1)
         
@@ -198,23 +201,21 @@ class RetroBoard(tk.Frame):
     def save_file(self, filename):
         data = []
         for iid in self.audio_table.get_children():
-            item = self.audio_table.item(iid)
-            data.append(item['values'].copy())
-        with open(filename, 'w') as outfile:
-            json.dump(data, outfile)
+            item = self.audio_table.item(iid).copy()
+            item['hotkey']._on_activate = None
+            data.append((item['values'].copy(), item['hotkey']))
+        with open(filename, 'wb') as outfile:
+            pickle.dump(data, outfile)
     
     def load_file(self, filename):
-        with open(filename, 'r') as infile:
-            data = json.load(infile)
+        with open(filename, 'rb') as infile:
+            data = pickle.load(infile)
         self.audio_table.delete(*self.audio_table.get_children())
         for d in data:
-            self.audio_table.insert('', 'end', None, values=d.copy())
+            self.audio_table.insert('', 'end', None, d[1], values=d[0].copy())
 
 def main():
-    root = tk.Tk()
-    root.geometry("500x600")
-    root.title('retroboard')
-    app = RetroBoard(root)
+    app = RetroBoard()
     app.mainloop()
 
 if __name__ == '__main__':

@@ -24,8 +24,8 @@ class EntryFrame(tk.Toplevel):
 
     def setup_widgets(self):
         # Create new window
-        self.geometry('500x170')
-        self.resizable(width=False, height=False)
+        self.geometry('500x250')
+        #self.resizable(width=False, height=False)
         self.grab_set()
         self.focus_force()
         popup_frame = tk.Frame(self)
@@ -79,5 +79,4 @@ class EntryFrame(tk.Toplevel):
             self.master.edit_entry(self.iid, filename, hotkeys_str, hotkey)
         elif filename and filename != 'None Selected':
             self.iid = self.master.add_entry(filename, hotkeys_str, hotkey)
-        hotkey._on_activate = lambda: self.master.play_entry(self.iid)
         self.destroy()
