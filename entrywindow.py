@@ -62,6 +62,7 @@ class EntryWindow(tk.Toplevel):
         self.bind('<KP_Enter>', lambda x: self.submit())
 
     def browse_files(self):
+        self.hotkey_entry.stop()
         filenames = filedialog.askopenfilenames()
         if len(filenames) == 1:
             self.filename_var.set(filenames[0])

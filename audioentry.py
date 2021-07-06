@@ -17,6 +17,14 @@ class AudioEntry():
     
     def load_audio(self):
         self.segment = pydub.AudioSegment.from_file(self.path)
+        device_indexes = self.parent.get_devices()
+        max_channels = sounddevice.query_devices(device_indexes[0])['max_output_channels']
+        for index in device_indexes:
+            c = sounddevice.query_devices(index)['max_output_channels']
+            if c < max_channels:
+                max_channels = c
+        if max_channels < self.segment.channels:
+            self.segment = self.segment.set_channels(max_channels)
         data = numpy.array(self.segment.get_array_of_samples())
         self.data = data.reshape(int(len(data)/self.segment.channels), self.segment.channels)
         self.frame_count = len(self.data)
