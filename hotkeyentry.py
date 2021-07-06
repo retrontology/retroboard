@@ -1,8 +1,7 @@
 import tkinter as tk
 from threading import Thread
 from time import sleep
-from pynput import keyboard, mouse
-from enum import Enum
+from pynput import keyboard
 
 class HotkeyEntry(tk.Entry):
     def __init__(self, master=None, cnf={}, **kw):

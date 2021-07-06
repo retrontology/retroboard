@@ -1,8 +1,7 @@
-from subprocess import call
-from numpy.core.shape_base import block
 import pydub
 import sounddevice
 import numpy
+from threading import Thread
 
 class AudioEntry():
     
@@ -22,6 +21,10 @@ class AudioEntry():
         self.data = data.reshape(int(len(data)/self.segment.channels), self.segment.channels)
         self.frame_count = len(self.data)
     
+    def clear_audio(self):
+        self.data = None
+        self.segment = None
+    
     def playback_callback(self, outdata, frame_count, time_info, status):
         if status:
             print(status)
@@ -35,11 +38,15 @@ class AudioEntry():
     
     def playback_finished(self):
         self.parent.playing.remove(self)
-        self.data = None
-        self.segment = None
+        self.clear_audio()
         del self
 
     def play(self):
+        self.stop()
+        self.playback_thread = Thread(target=self._play)
+        self.playback_thread.start()
+
+    def _play(self):
         if not self.segment or not self.data:
             self.load_audio()
         for device in self.parent.get_devices():
@@ -50,3 +57,4 @@ class AudioEntry():
     def stop(self):
         for stream in self.streams:
             stream.stop()
+        self.streams.clear()

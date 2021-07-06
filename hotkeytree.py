@@ -1,6 +1,5 @@
 from os import stat
 from tkinter.ttk import Treeview, Widget, _format_optdict, _val_or_dict
-
 from pynput import keyboard
 
 class HotKeyTree(Treeview):

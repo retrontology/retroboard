@@ -2,9 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
 from hotkeyentry import HotkeyEntry
-from pynput.keyboard import HotKey
 
-class EntryFrame(tk.Toplevel):
+class EntryWindow(tk.Toplevel):
 
     def __init__(self, master=None, filename=None, hotkeys=None, iid=None):
         super().__init__(master)

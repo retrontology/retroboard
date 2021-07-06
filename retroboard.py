@@ -1,13 +1,12 @@
 import tkinter as tk
-import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
 import sounddevice
 from audioentry import AudioEntry
-from entryframe import EntryFrame
+from entrywindow import EntryWindow
 from hotkeytree import HotKeyTree
+from errorwindow import ErrorWindow
 import os
 import pickle
-from threading import Thread
 
 DEFAULT_SAVE = 'default.rbd'
 
@@ -135,7 +134,7 @@ class RetroBoard(tk.Tk):
     def play_entry(self, item):
         filename = self.audio_table.item(item)['values'][2]
         af = AudioEntry(filename, self)
-        Thread(target=af.play).start()
+        af.play()
         self.playing.append(af)
 
     def get_devices(self):
@@ -160,12 +159,12 @@ class RetroBoard(tk.Tk):
         item = self.audio_table.focus()
         if item:
             item = self.audio_table.item(item)
-            EntryFrame(self, item['values'][2], item['values'][1], item)
+            EntryWindow(self, item['values'][2], item['values'][1], item)
         else:
-            EntryFrame(self)
+            EntryWindow(self)
 
     def add_button_callback(self):
-        EntryFrame(self)
+        EntryWindow(self)
 
     def remove_button_callback(self):
         item = self.audio_table.focus()
@@ -176,7 +175,7 @@ class RetroBoard(tk.Tk):
         index = self.audio_table.focus()
         if index:
             item = self.audio_table.item(index)
-            EntryFrame(self, item['values'][2], item['values'][1], index)
+            EntryWindow(self, item['values'][2], item['values'][1], index)
 
     def play_button_callback(self):
         item = self.audio_table.focus()
