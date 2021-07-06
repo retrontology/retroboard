@@ -115,7 +115,7 @@ class RetroBoard(tk.Tk):
         
         # Get device info
         devices = sounddevice.query_devices()
-        device_names = [f'{i+1}. {x["name"]}' for i, x in enumerate(devices)]
+        device_names = [f'{i+1}. {x["name"]}' for i, x in enumerate(devices) if x['max_output_channels'] > 0]
 
         # Primary output
         primary_device_label = tk.Label(device_frame, text='Primary Output Device')
