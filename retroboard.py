@@ -212,6 +212,9 @@ class RetroBoard(tk.Tk):
         self.audio_table.delete(*self.audio_table.get_children())
         for d in data:
             self.audio_table.insert('', 'end', None, d[1], values=d[0].copy())
+    
+    def error(self, message):
+        ErrorWindow(message, self)
 
 def main():
     app = RetroBoard()
