@@ -29,6 +29,12 @@ class RetroBoard(tk.Tk):
         self.bind('<KP_Enter>', self.enter_callback)
     
     def setup_variables(self):
+        # Hidden Application Variables
+        dir = os.path.dirname(os.path.abspath(__file__))
+        default_file = os.path.join(dir, DEFAULT_SAVE)
+        self.savefile = tk.StringVar(self, default_file, 'savefile')
+
+        # Device Variables
         devices = sounddevice.query_devices()
         device_names = [f'{i+1}. {x["name"]}' for i, x in enumerate(devices)]
         odev = sounddevice._get_device_id(sounddevice.default.device['output'], 'output')
@@ -45,8 +51,8 @@ class RetroBoard(tk.Tk):
         topframe.pack(fill='both', expand=True)
         topframe.columnconfigure(0, weight=1)
         topframe.rowconfigure(0, weight=1)
-        self.create_menu()
         self.create_audio_table(topframe)
+        self.create_menu()
         self.create_buttons(topframe)
         self.create_device_selection(topframe)
 
@@ -57,9 +63,11 @@ class RetroBoard(tk.Tk):
 
         # File Menu
         file_menu = tk.Menu(self.menubar, tearoff=0)
+        file_menu.add_command(label='New', command=self.audio_table.clear)
+        file_menu.add_command(label='Open', command=self.file_load_callback)
+        file_menu.add_command(label='Save', command=self.file_save_callback)
         file_menu.add_command(label='Save As', command=self.file_save_as_callback)
-        file_menu.add_command(label='Load', command=self.file_load_callback)
-        file_menu.add_command(label='Exit', command=self.on_exit)
+        file_menu.add_command(label='Quit', command=self.on_exit)
         self.menubar.add_cascade(label = "File", menu=file_menu)
 
     def create_audio_table(self, frame):
@@ -198,9 +206,16 @@ class RetroBoard(tk.Tk):
     def stop_all(self):
         while len(self.playing) > 0:
             self.playing[0].stop()
+    
+    def file_save_callback(self):
+        default_file = self.savefile.get()
+        if os.path.isfile(default_file):
+            self.save_file(default_file)
+        else:
+            self.file_save_as_callback()
 
     def file_save_as_callback(self):
-        filename = filedialog.asksaveasfilename(initialfile=DEFAULT_SAVE)
+        filename = filedialog.asksaveasfilename(initialfile=DEFAULT_SAVE, initialdir=os.path.dirname(os.path.abspath(__file__)))
         if filename:
             self.save_file(filename)
 
@@ -216,17 +231,17 @@ class RetroBoard(tk.Tk):
             data.append((item['values'].copy(), item['hotkey']._keys.copy()))
         with open(filename, 'wb') as outfile:
             pickle.dump(data, outfile)
+        self.savefile.set(filename)
     
     def load_file(self, filename):
         with open(filename, 'rb') as infile:
             data = pickle.load(infile)
-        self.audio_table.delete(*self.audio_table.get_children())
+        self.audio_table.clear()
         for d in data:
             self.audio_table.insert('', 'end', None, HotKey(d[1], None), values=d[0].copy())
     
     def load_default_file(self):
-        dir = os.path.dirname(os.path.abspath(__file__))
-        default_file = os.path.join(dir, DEFAULT_SAVE)
+        default_file = self.savefile.get()
         if os.path.isfile(default_file):
             self.load_file(default_file)
     

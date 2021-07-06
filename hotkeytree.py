@@ -9,6 +9,9 @@ class HotKeyTree(Treeview):
         self._hotkeys = dict()
         self._listeners = dict()
     
+    def clear(self):
+        self.delete(*self.get_children())
+    
     def delete(self, *items):
         self.tk.call(self._w, "delete", items)
         for item in items:
