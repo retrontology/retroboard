@@ -50,9 +50,12 @@ class AudioEntry():
         if not self.segment or not self.data:
             self.load_audio()
         for device in self.parent.get_devices():
-            output = sounddevice.OutputStream(callback=self.playback_callback, finished_callback=self.playback_finished, device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.data.dtype)
-            output.start()
-            self.streams.append(output)
+            try:
+                output = sounddevice.OutputStream(callback=self.playback_callback, finished_callback=self.playback_finished, device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.data.dtype)
+                output.start()
+                self.streams.append(output)
+            except Exception as e:
+                self.parent.error(e)
 
     def stop(self):
         for stream in self.streams:
