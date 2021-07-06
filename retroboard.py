@@ -6,11 +6,14 @@ from audioentry import AudioEntry
 from entrywindow import EntryWindow
 from hotkeytree import HotKeyTree
 from errorwindow import ErrorWindow
+from settingswindow import SettingsWindow
 from pynput.keyboard import HotKey
 import os
 import pickle
+import webbrowser
 
 DEFAULT_SAVE = 'default.rbd'
+GITHUB_URL = 'https://github.com/retrontology/retroboard'
 
 class RetroBoard(tk.Tk):
 
@@ -65,10 +68,19 @@ class RetroBoard(tk.Tk):
         file_menu = tk.Menu(self.menubar, tearoff=0)
         file_menu.add_command(label='New', command=self.audio_table.clear)
         file_menu.add_command(label='Open', command=self.file_load_callback)
-        file_menu.add_command(label='Save', command=self.file_save_callback)
+        file_menu.add_separator()
+        file_menu.add_command(label='Save        Ctrl+S', command=self.file_save_callback)
         file_menu.add_command(label='Save As', command=self.file_save_as_callback)
+        file_menu.add_separator()
+        file_menu.add_command(label='GitHub Page', command=lambda: webbrowser.open(GITHUB_URL))
+        file_menu.add_separator()
         file_menu.add_command(label='Quit', command=self.on_exit)
         self.menubar.add_cascade(label = "File", menu=file_menu)
+
+        # Option Menu
+        settings_menu = tk.Menu(self.menubar, tearoff=0)
+        settings_menu.add_command(label='Settings', command=lambda: SettingsWindow(self))
+        self.menubar.add_cascade(label = 'Option', menu=settings_menu)
 
     def create_audio_table(self, frame):
         # Top Level frame for table of audio clips
