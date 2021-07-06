@@ -5,6 +5,7 @@ from audioentry import AudioEntry
 from entrywindow import EntryWindow
 from hotkeytree import HotKeyTree
 from errorwindow import ErrorWindow
+from pynput.keyboard import HotKey
 import os
 import pickle
 
@@ -193,18 +194,19 @@ class RetroBoard(tk.Tk):
 
     def file_save_as_callback(self):
         filename = filedialog.asksaveasfilename(initialfile=DEFAULT_SAVE)
-        self.save_file(filename)
+        if filename:
+            self.save_file(filename)
 
     def file_load_callback(self):
         filename = filedialog.askopenfilename(initialfile=DEFAULT_SAVE)
-        self.load_file(filename)
+        if filename:
+            self.load_file(filename)
 
     def save_file(self, filename):
         data = []
         for iid in self.audio_table.get_children():
             item = self.audio_table.item(iid).copy()
-            item['hotkey']._on_activate = None
-            data.append((item['values'].copy(), item['hotkey']))
+            data.append((item['values'].copy(), item['hotkey']._keys.copy()))
         with open(filename, 'wb') as outfile:
             pickle.dump(data, outfile)
     
@@ -213,7 +215,7 @@ class RetroBoard(tk.Tk):
             data = pickle.load(infile)
         self.audio_table.delete(*self.audio_table.get_children())
         for d in data:
-            self.audio_table.insert('', 'end', None, d[1], values=d[0].copy())
+            self.audio_table.insert('', 'end', None, HotKey(d[1], None), values=d[0].copy())
     
     def load_default_file(self):
         dir = os.path.dirname(os.path.abspath(__file__))
