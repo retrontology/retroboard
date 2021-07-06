@@ -30,7 +30,7 @@ class RetroBoard(tk.Tk):
     
     def setup_variables(self):
         devices = sounddevice.query_devices()
-        device_names = [f'{i}. {x["name"]}' for i, x in enumerate(devices)]
+        device_names = [f'{i+1}. {x["name"]}' for i, x in enumerate(devices)]
         odev = sounddevice._get_device_id(sounddevice.default.device['output'], 'output')
         default_device = device_names[odev]
         self.primary_device = tk.StringVar(self, default_device, 'primary_device')
@@ -115,7 +115,7 @@ class RetroBoard(tk.Tk):
         
         # Get device info
         devices = sounddevice.query_devices()
-        device_names = [f'{i}. {x["name"]}' for i, x in enumerate(devices)]
+        device_names = [f'{i+1}. {x["name"]}' for i, x in enumerate(devices)]
 
         # Primary output
         primary_device_label = tk.Label(device_frame, text='Primary Output Device')
@@ -134,9 +134,6 @@ class RetroBoard(tk.Tk):
         secondary_device_enable_button = tk.Checkbutton(secondary_device_frame, text='Use', variable=self.secondary_device_enable, command=self.toggle_secondary_device_enable)
         self.toggle_secondary_device_enable()
         secondary_device_enable_button.grid(column=1, row=0, sticky='nsew')
-    
-    def testmenu(self, out):
-        print(out)
         
     def toggle_secondary_device_enable(self):
         if self.secondary_device_enable.get():
@@ -151,9 +148,9 @@ class RetroBoard(tk.Tk):
         self.playing.append(af)
 
     def get_devices(self):
-        out = [int(self.primary_device.get().split('.', 1)[0])]
+        out = [int(self.primary_device.get().split('.', 1)[0]) - 1]
         if self.secondary_device_enable.get():
-            out.append(int(self.secondary_device.get().split('.', 1)[0]))
+            out.append(int(self.secondary_device.get().split('.', 1)[0]) - 1)
         return out
     
     def add_entry(self, filename, hotkeys_str='', hotkey=None):

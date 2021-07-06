@@ -37,7 +37,8 @@ class AudioEntry():
         self.frame_index += valid_frames
     
     def playback_finished(self):
-        self.parent.playing.remove(self)
+        if self in self.parent.playing:
+            self.parent.playing.remove(self)
         self.clear_audio()
         del self
 
