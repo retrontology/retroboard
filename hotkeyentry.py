@@ -4,14 +4,14 @@ from time import sleep
 from pynput import keyboard
 
 class HotkeyEntry(tk.Entry):
-    def __init__(self, master=None, clearable:bool=True, cnf={}, **kw):
+    def __init__(self, master=None, clearable:bool=True, stored=set(), cnf={}, **kw):
         kw['state'] = 'disabled'
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
         self.clearable = clearable
         self.hotkey_var: tk.StringVar = kw['textvariable']
         self.keys_pressed = set()
-        self.keys_stored = set()
+        self.keys_stored = stored
         self.capture = False
         self.capture_process = None
         self.bind('<ButtonRelease-1>', self.left_click_callback, '+')

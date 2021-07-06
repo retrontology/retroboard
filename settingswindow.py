@@ -2,7 +2,7 @@ import tkinter as tk
 from pynput import keyboard
 from hotkeyentry import HotkeyEntry
 
-DEFAULT_STOP = (keyboard.Key.pause)
+DEFAULT_STOP = set([keyboard.Key.pause])
 
 class SettingsWindow(tk.Toplevel):
     
@@ -24,5 +24,6 @@ class SettingsWindow(tk.Toplevel):
         hotkey_frame.columnconfigure(0, weight=2)
         hotkey_frame.columnconfigure(1, weight=1)
         tk.Label(hotkey_frame, text="'Stop All Sounds' hotkey:", justify='left').grid(column=0, row=0, sticky='w', padx=5, pady=5)
-        self.stopall = HotkeyEntry(hotkey_frame, clearable=False, textvariable=self.master.stopall_var)
+        self.stopall = HotkeyEntry(hotkey_frame, clearable=False, stored=DEFAULT_STOP, textvariable=self.master.stopall_var)
         self.stopall.grid(column=1, row=0, sticky='ew', padx=5, pady=5)
+
