@@ -7,7 +7,7 @@ from entrywindow import EntryWindow
 from hotkeytree import HotKeyTree
 from errorwindow import ErrorWindow
 from settingswindow import SettingsWindow
-from pynput.keyboard import HotKey
+from pynput.keyboard import HotKey, Key
 import os
 import pickle
 import webbrowser
@@ -46,6 +46,10 @@ class RetroBoard(tk.Tk):
         self.primary_device = tk.StringVar(self, default_device, 'primary_device')
         self.secondary_device = tk.StringVar(self, default_device, 'secondary_device')
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
+
+        # Global Hotkey Variables
+        self.stopall_var = tk.StringVar(self, '<Pause>', 'hotkey_stopall')
+        self.stopall_hotkey = HotKey([Key.pause], None)
 
     def on_exit(self):
         self.destroy()

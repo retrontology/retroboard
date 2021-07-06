@@ -4,10 +4,11 @@ from time import sleep
 from pynput import keyboard
 
 class HotkeyEntry(tk.Entry):
-    def __init__(self, master=None, cnf={}, **kw):
+    def __init__(self, master=None, clearable:bool=True, cnf={}, **kw):
         kw['state'] = 'disabled'
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
+        self.clearable = clearable
         self.hotkey_var: tk.StringVar = kw['textvariable']
         self.keys_pressed = set()
         self.keys_stored = set()
@@ -23,7 +24,10 @@ class HotkeyEntry(tk.Entry):
 
     def right_click_callback(self, key):
         self.capture = False
-        self.clear_hotkeys()
+        if self.clearable:
+            self.keys_pressed.clear()
+            self.keys_stored.clear()
+            self.clear_hotkeys()
     
     def stop(self):
         if self.capture:
