@@ -3,11 +3,12 @@ from tkinter import ttk
 import tkinter.filedialog as filedialog
 import sounddevice
 from audioentry import AudioEntry
+from hotkeylistener import HotkeyListener, HotkeyScope
 from entrywindow import EntryWindow
 from hotkeytree import HotKeyTree
 from errorwindow import ErrorWindow
 from settingswindow import SettingsWindow
-from pynput.keyboard import HotKey, Key
+from pynput import keyboard
 import os
 import pickle
 import webbrowser
@@ -22,6 +23,7 @@ class RetroBoard(tk.Tk):
         self.geometry("500x600")
         self.title('retroboard')
         self.playing = []
+        self.hotkey_listener = HotkeyListener(self)
         self.setup_variables()
         self.setup_widgets()
         self.setup_binds()
@@ -36,7 +38,7 @@ class RetroBoard(tk.Tk):
         # Hidden Application Variables
         dir = os.path.dirname(os.path.abspath(__file__))
         default_file = os.path.join(dir, DEFAULT_SAVE)
-        self.savefile = tk.StringVar(self, default_file, 'savefile')
+        self._savefile = tk.StringVar(self, default_file, 'savefile')
 
         # Device Variables
         devices = sounddevice.query_devices()
@@ -49,7 +51,7 @@ class RetroBoard(tk.Tk):
 
         # Global Hotkey Variables
         self.stopall_var = tk.StringVar(self, '<Pause>', 'hotkey_stopall')
-        self.stopall_hotkey = HotKey([Key.pause], None)
+        self.stopall_hotkey = keyboard.HotKey([keyboard.Key.pause], None)
 
     def on_exit(self):
         self.destroy()
@@ -187,7 +189,7 @@ class RetroBoard(tk.Tk):
         self.audio_table.set(iid, column='Sound Clip', value=name)
         self.audio_table.set(iid, column='HotKeys', value=hotkeys_str)
         self.audio_table.set(iid, column='path', value=filename)
-        self.audio_table.set_hotkey(iid, hotkey)
+        self.hotkey_listener.set_hotkey(iid, hotkey, HotkeyScope.TABLE)
         return iid
     
     def enter_callback(self, somevar):
@@ -225,7 +227,7 @@ class RetroBoard(tk.Tk):
             self.playing[0].stop()
     
     def file_save_callback(self):
-        default_file = self.savefile.get()
+        default_file = self._savefile.get()
         if os.path.isfile(default_file):
             self.save_file(default_file)
         else:
@@ -252,7 +254,7 @@ class RetroBoard(tk.Tk):
             data.append((item['values'].copy(), hotkey))
         with open(filename, 'wb') as outfile:
             pickle.dump(data, outfile)
-        self.savefile.set(filename)
+        self._savefile.set(filename)
     
     def load_file(self, filename):
         with open(filename, 'rb') as infile:
@@ -260,13 +262,13 @@ class RetroBoard(tk.Tk):
         self.audio_table.clear()
         for d in data:
             if d[1]:
-                hotkey = HotKey(d[1], None)
+                hotkey = keyboard.HotKey(d[1], None)
             else:
                 hotkey = None
             self.audio_table.insert('', 'end', None, hotkey, values=d[0].copy())
     
     def load_default_file(self):
-        default_file = self.savefile.get()
+        default_file = self._savefile.get()
         if os.path.isfile(default_file):
             self.load_file(default_file)
     
