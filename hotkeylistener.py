@@ -20,12 +20,12 @@ class HotkeyListener():
     def set_global_hotkeys(self):
         self.set_hotkey('stop_all', keyboard.HotKey(DEFAULT_STOP_ALL, self.parent.stop_all), HotkeyScope.GLOBAL)
     
-    def get_hotkey_keys(self, index, scope):
+    def get_hotkey(self, index, scope):
         if scope == HotkeyScope.GLOBAL:
             hotkeys = self._global_hotkeys
         elif scope == HotkeyScope.TABLE:
             hotkeys = self._table_hotkeys
-        return hotkeys[index]._keys
+        return hotkeys[index]
     
     def set_hotkey(self, index, hotkey, scope:HotkeyScope):
         if scope == HotkeyScope.GLOBAL:
