@@ -4,10 +4,11 @@ from time import sleep
 from pynput import keyboard
 
 class HotkeyEntry(tk.Entry):
-    def __init__(self, master=None, clearable:bool=True, stored=set(), cnf={}, **kw):
+    def __init__(self, master=None, clearable:bool=True, stored=set(), stop_callback = None, cnf={}, **kw):
         kw['state'] = 'disabled'
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
+        self.stop_callback = stop_callback
         self.clearable = clearable
         self.hotkey_var: tk.StringVar = kw['textvariable']
         self.keys_pressed = set()
@@ -48,6 +49,8 @@ class HotkeyEntry(tk.Entry):
             self.winfo_toplevel().unbind('<ButtonRelease-1>', binds[0])
             self.winfo_toplevel().unbind('<ButtonRelease-3>', binds[1])
             self.config({"disabledbackground": "light gray"})
+        if self.stop_callback is not None:
+            self.stop_callback(self)
 
     def clear_hotkeys(self):
         self.hotkey_var.set('')
