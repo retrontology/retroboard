@@ -12,6 +12,10 @@ class EntryWindow(tk.Toplevel):
         self.setup_variables(filename, hotkeys)
         self.setup_widgets()
         self.setup_binds()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+    
+    def on_closing(self):
+        self.submit()
     
     def setup_variables(self, filename=None, hotkeys=None):
         if not filename:

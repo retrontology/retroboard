@@ -1,3 +1,4 @@
+from hotkeyentry import HotkeyEntry
 import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as filedialog
@@ -23,7 +24,6 @@ class RetroBoard(tk.Tk):
         self.geometry("500x600")
         self.title('retroboard')
         self.playing = []
-        self.hotkey_listener = HotkeyListener(self)
         self.setup_variables()
         self.setup_widgets()
         self.setup_binds()
@@ -36,6 +36,7 @@ class RetroBoard(tk.Tk):
     
     def setup_variables(self):
         # Hidden Application Variables
+        self.hotkey_listener = HotkeyListener(self)
         dir = os.path.dirname(os.path.abspath(__file__))
         default_file = os.path.join(dir, DEFAULT_SAVE)
         self._savefile = tk.StringVar(self, default_file, 'savefile')
@@ -50,8 +51,8 @@ class RetroBoard(tk.Tk):
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
-        self.stopall_var = tk.StringVar(self, '<Pause>', 'hotkey_stopall')
-        self.stopall_hotkey = keyboard.HotKey([keyboard.Key.pause], None)
+        self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
+        self.ptt_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys), 'hotkey_ptt')
 
     def on_exit(self):
         self.destroy()
