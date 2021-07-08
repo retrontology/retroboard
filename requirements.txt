@@ -1,2 +1,4 @@
-tkinter
-sounddevice
+numpy==1.21.0
+sounddevice==0.4.1
+pydub==0.25.1
+pynput==1.7.3
