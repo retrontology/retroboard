@@ -2,6 +2,7 @@ import pydub
 import sounddevice
 import numpy
 from threading import Thread
+from functools import partial
 
 class AudioEntry():
     
@@ -9,7 +10,7 @@ class AudioEntry():
         self.parent = parent
         self.path = path
         self.gain = gain
-        self.frame_index = 0
+        self.frame_index = dict()
         self.segment = None
         self.data = None
         self.frame_count = None
@@ -33,16 +34,16 @@ class AudioEntry():
         self.data = None
         self.segment = None
     
-    def playback_callback(self, outdata, frame_count, time_info, status):
+    def playback_callback(self, device_index, outdata, frame_count, time_info, status):
         if status:
             print(status)
-        remainder = self.frame_count - self.frame_index
+        remainder = self.frame_count - self.frame_index[device_index]
         if remainder < 1:
             raise sounddevice.CallbackStop
         valid_frames = frame_count if remainder >= frame_count else remainder
-        outdata[:valid_frames] = self.data[self.frame_index:self.frame_index + valid_frames]
+        outdata[:valid_frames] = self.data[self.frame_index[device_index]:self.frame_index[device_index] + valid_frames]
         outdata[valid_frames:] = 0
-        self.frame_index += valid_frames
+        self.frame_index[device_index] += valid_frames
     
     def playback_finished(self):
         if self in self.parent.playing:
@@ -58,11 +59,14 @@ class AudioEntry():
     def _play(self):
         if not self.segment or not self.data:
             self.load_audio()
+        device_index = 0
         for device in self.parent.get_devices():
+            self.frame_index[device_index] = 0
             try:
-                output = sounddevice.OutputStream(callback=self.playback_callback, finished_callback=self.playback_finished, device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.data.dtype)
-                output.start()
+                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=self.playback_finished, device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.data.dtype)
                 self.streams.append(output)
+                output.start()
+                device_index += 1
             except Exception as e:
                 self.parent.error(e)
 
@@ -70,3 +74,4 @@ class AudioEntry():
         for stream in self.streams:
             stream.stop()
         self.streams.clear()
+        self.frame_index.clear()
