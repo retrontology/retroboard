@@ -180,7 +180,7 @@ class RetroBoard(tk.Tk):
             kbc = keyboard.Controller()
             for key in keys:
                 kbc.press(key)
-            while len(self.playing) > 1:
+            while len(self.playing) > 0:
                 sleep(1)
             for key in keys:
                 kbc.release(key)
@@ -192,8 +192,8 @@ class RetroBoard(tk.Tk):
     def play_entry(self, item):
         filename = self.audio_table.item(item)['values'][2]
         af = AudioEntry(filename, self)
-        af.play()
         self.playing.append(af)
+        af.play()
         self.ptt_thread = Thread(target=self.ptt_press).start()
 
     def get_devices(self):

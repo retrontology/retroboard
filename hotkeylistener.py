@@ -20,7 +20,7 @@ class HotkeyListener():
 
     def set_global_hotkeys(self):
         self.set_hotkey('stop_all', keyboard.HotKey(DEFAULT_STOP_ALL, self.parent.stop_all), HotkeyScope.GLOBAL)
-        self.set_hotkey('ptt', keyboard.HotKey(DEFAULT_PTT, self.parent.stop_all), HotkeyScope.GLOBAL)
+        self.set_hotkey('ptt', keyboard.HotKey(DEFAULT_PTT, None), HotkeyScope.GLOBAL)
     
     def get_hotkey(self, index, scope):
         if scope == HotkeyScope.GLOBAL:
@@ -42,8 +42,11 @@ class HotkeyListener():
         if hotkey != None:
             if hotkey._on_activate is None and scope == HotkeyScope.TABLE:
                 hotkey._on_activate = lambda: self.parent.play_entry(index)
-            listeners[index] = keyboard.Listener(on_press=self.for_canonical(hotkeys[index].press, index, scope), on_release=self.for_canonical(hotkeys[index].release, index, scope))
-            listeners[index].start()
+            if hotkey._on_activate is not None:
+                listeners[index] = keyboard.Listener(on_press=self.for_canonical(hotkeys[index].press, index, scope), on_release=self.for_canonical(hotkeys[index].release, index, scope))
+                listeners[index].start()
+            else:
+                listeners[index] = None
         else:
             listeners[index] = None
     

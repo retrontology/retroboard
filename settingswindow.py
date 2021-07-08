@@ -33,7 +33,7 @@ class SettingsWindow(tk.Toplevel):
         self.ptt_enable.grid(column=1, row=1, sticky='w')
         self.master.toggle_ptt_enable()
         tk.Label(hotkey_frame, text="VoIP 'Push To Talk' hotkey(s):", justify='left').grid(column=0, row=2, sticky='w')
-        self.ptt = HotkeyEntry(hotkey_frame, clearable=False, stored=self.master.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys, stop_callback=lambda x: self.bind_global_hotkey('ptt', x, None), textvariable=self.master.ptt_var)
+        self.ptt = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys, stop_callback=lambda x: self.bind_global_hotkey('ptt', x, None), textvariable=self.master.ptt_var)
         self.ptt.grid(column=1, row=2, sticky='ew')
 
     def bind_global_hotkey(self, index, hkentry:HotkeyEntry, command):
