@@ -13,6 +13,8 @@ from pynput import keyboard
 import os
 import pickle
 import webbrowser
+from time import sleep
+from threading import Thread
 
 DEFAULT_SAVE = 'default.rbd'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
@@ -52,6 +54,8 @@ class RetroBoard(tk.Tk):
 
         # Global Hotkey Variables
         self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
+        self.ptt_pressed = False
+        self.ptt_enable_var = tk.BooleanVar(self, False, 'ptt_enable')
         self.ptt_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys), 'hotkey_ptt')
 
     def on_exit(self):
@@ -169,11 +173,28 @@ class RetroBoard(tk.Tk):
         else:
             self.secondary_device_menu.configure(state='disabled')
     
+    def ptt_press(self):
+        keys = self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys
+        if len(keys) > 0 and self.ptt_enable_var.get() and not self.ptt_pressed:
+            self.ptt_pressed = True
+            kbc = keyboard.Controller()
+            for key in keys:
+                kbc.press(key)
+            while len(self.playing) > 1:
+                sleep(1)
+            for key in keys:
+                kbc.release(key)
+            self.ptt_pressed = False
+                
+    def toggle_ptt_enable(self):
+        pass
+    
     def play_entry(self, item):
         filename = self.audio_table.item(item)['values'][2]
         af = AudioEntry(filename, self)
         af.play()
         self.playing.append(af)
+        self.ptt_thread = Thread(target=self.ptt_press).start()
 
     def get_devices(self):
         out = [int(self.primary_device.get().split('.', 1)[0]) - 1]
