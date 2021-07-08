@@ -14,7 +14,7 @@ class AudioEntry():
         self.segment = None
         self.data = None
         self.frame_count = None
-        self.streams = []
+        self.streams = dict()
     
     def load_audio(self):
         self.segment = pydub.AudioSegment.from_file(self.path)
@@ -45,11 +45,14 @@ class AudioEntry():
         outdata[valid_frames:] = 0
         self.frame_index[device_index] += valid_frames
     
-    def playback_finished(self):
-        if self in self.parent.playing:
-            self.parent.playing.remove(self)
-        self.clear_audio()
-        del self
+    def playback_finished(self, device_index):
+        self.streams.pop(device_index)
+        self.frame_index.pop(device_index)
+        if len(self.streams) == 0:
+            if self in self.parent.playing:
+                self.parent.playing.remove(self)
+            self.clear_audio()
+            del self
 
     def play(self):
         self.stop()
@@ -63,15 +66,13 @@ class AudioEntry():
         for device in self.parent.get_devices():
             self.frame_index[device_index] = 0
             try:
-                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=self.playback_finished, device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.data.dtype)
-                self.streams.append(output)
+                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.data.dtype)
+                self.streams[device_index] = output
                 output.start()
                 device_index += 1
             except Exception as e:
                 self.parent.error(e)
 
     def stop(self):
-        for stream in self.streams:
-            stream.stop()
-        self.streams.clear()
-        self.frame_index.clear()
+        for i in range(len(self.streams)):
+            self.streams[i].stop()
