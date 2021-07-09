@@ -86,5 +86,8 @@ class HotkeyEntry(tk.Entry):
             if type(key) == keyboard.Key:
                 out += f'<{key._name_}>'
             elif type(key) == keyboard.KeyCode:
-                out += key.char
+                if key.char:
+                    out += key.char
+                else:
+                    out += '?'
         return out
