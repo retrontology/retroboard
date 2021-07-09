@@ -53,6 +53,8 @@ class RetroBoard(tk.Tk):
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
+        self.hotkey_listener.set_hotkey('stop_all', keyboard.HotKey(HotkeyListener.DEFAULT_STOP_ALL, self.stop_all), HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('ptt', keyboard.HotKey(HotkeyListener.DEFAULT_PTT, None), HotkeyScope.GLOBAL)
         self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
         self.ptt_enable_var = tk.BooleanVar(self, False, 'ptt_enable')

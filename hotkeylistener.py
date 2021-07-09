@@ -1,14 +1,14 @@
 from pynput import keyboard
 from enum import Enum
 
-DEFAULT_STOP_ALL = set([keyboard.Key.pause])
-DEFAULT_PTT = set([keyboard.KeyCode(char='v')])
-
 class HotkeyScope(Enum):
     GLOBAL = 0
     TABLE = 1
 
 class HotkeyListener():
+
+    DEFAULT_STOP_ALL = set([keyboard.Key.pause])
+    DEFAULT_PTT = set([keyboard.KeyCode(char='v')])
 
     def __init__(self, parent):
         self.parent = parent
@@ -16,12 +16,7 @@ class HotkeyListener():
         self._global_listeners = dict()
         self._table_hotkeys = dict()
         self._table_listeners = dict()
-        self.set_global_hotkeys()
-
-    def set_global_hotkeys(self):
-        self.set_hotkey('stop_all', keyboard.HotKey(DEFAULT_STOP_ALL, self.parent.stop_all), HotkeyScope.GLOBAL)
-        self.set_hotkey('ptt', keyboard.HotKey(DEFAULT_PTT, None), HotkeyScope.GLOBAL)
-    
+        
     def get_hotkey(self, index, scope):
         if scope == HotkeyScope.GLOBAL:
             hotkeys = self._global_hotkeys
