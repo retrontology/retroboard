@@ -12,7 +12,6 @@ class AudioEntry():
         self.gain = gain
         self.frame_index = dict()
         self.segment = None
-        self.frame_count = None
         self.streams = dict()
     
     def load_audio(self):
