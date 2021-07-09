@@ -290,6 +290,7 @@ class RetroBoard(tk.Tk):
             else:
                 hotkey = None
             self.audio_table.insert('', 'end', None, hotkey, values=d[0].copy())
+        self._savefile.set(filename)
     
     def load_default_file(self):
         default_file = self._savefile.get()
