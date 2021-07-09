@@ -37,7 +37,9 @@ class SettingsWindow(tk.Toplevel):
         self.ptt.grid(column=1, row=2, sticky='ew')
 
     def bind_global_hotkey(self, index, hkentry:HotkeyEntry, command):
-        self.master.hotkey_listener.set_hotkey(index, hkentry.get_hotkey(command), HotkeyScope.GLOBAL)
+        hotkey = hkentry.get_hotkey(command)
+        self.master.hotkey_listener.set_hotkey(index, hotkey, HotkeyScope.GLOBAL)
+        self.master.prefs[index] = hotkey._keys
     
     def on_closing(self):
         self.stopall.stop()

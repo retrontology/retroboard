@@ -7,9 +7,6 @@ class HotkeyScope(Enum):
 
 class HotkeyListener():
 
-    DEFAULT_STOP_ALL = set([keyboard.Key.pause])
-    DEFAULT_PTT = set([keyboard.KeyCode(char='v')])
-
     def __init__(self, parent):
         self.parent = parent
         self._global_hotkeys = dict()

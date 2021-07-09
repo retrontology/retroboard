@@ -15,8 +15,8 @@ import pickle
 import webbrowser
 from time import sleep
 from threading import Thread
+from preferences import *
 
-DEFAULT_SAVE = 'default.rbd'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 
 class RetroBoard(tk.Tk):
@@ -38,10 +38,9 @@ class RetroBoard(tk.Tk):
     
     def setup_variables(self):
         # Hidden Application Variables
+        self.prefs = Preferences()
         self.hotkey_listener = HotkeyListener(self)
-        dir = os.path.dirname(os.path.abspath(__file__))
-        default_file = os.path.join(dir, DEFAULT_SAVE)
-        self._savefile = tk.StringVar(self, default_file, 'savefile')
+        self._savefile = tk.StringVar(self, self.prefs['savefile'], 'savefile')
 
         # Device Variables
         devices = sounddevice.query_devices()
@@ -53,11 +52,11 @@ class RetroBoard(tk.Tk):
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
-        self.hotkey_listener.set_hotkey('stop_all', keyboard.HotKey(HotkeyListener.DEFAULT_STOP_ALL, self.stop_all), HotkeyScope.GLOBAL)
-        self.hotkey_listener.set_hotkey('ptt', keyboard.HotKey(HotkeyListener.DEFAULT_PTT, None), HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('stop_all', keyboard.HotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('ptt', keyboard.HotKey(self.prefs['ptt'], None), HotkeyScope.GLOBAL)
         self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
-        self.ptt_enable_var = tk.BooleanVar(self, False, 'ptt_enable')
+        self.ptt_enable_var = tk.BooleanVar(self, self.prefs['ptt_enable'], 'ptt_enable')
         self.ptt_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys), 'hotkey_ptt')
 
     def on_exit(self):
@@ -189,7 +188,7 @@ class RetroBoard(tk.Tk):
             self.ptt_pressed = False
                 
     def toggle_ptt_enable(self):
-        pass
+        self.prefs['ptt_enable'] = self.ptt_enable_var.get()
     
     def play_entry(self, item):
         filename = self.audio_table.item(item)['values'][2]
