@@ -2,6 +2,8 @@ import tkinter as tk
 from threading import Thread
 from time import sleep
 from pynput import keyboard
+import win_workaround
+
 
 class HotkeyEntry(tk.Entry):
     def __init__(self, master=None, clearable:bool=True, stored=set(), stop_callback = None, cnf={}, **kw):
@@ -56,6 +58,7 @@ class HotkeyEntry(tk.Entry):
         self.hotkey_var.set('')
     
     def key_press_callback(self, key):
+        key = win_workaround.parse_key(key)
         if not key in self.keys_pressed and key in self.keys_stored:
             self.keys_stored = self.keys_pressed.copy()
         self.keys_pressed.add(key)
@@ -66,6 +69,7 @@ class HotkeyEntry(tk.Entry):
         self.hotkey_var.set(self.set_to_string(self.keys_stored))
 
     def key_release_callback(self, key):
+        key = win_workaround.parse_key(key)
         if key in self.keys_pressed:
             self.keys_pressed.remove(key)
         self.hotkey_var.set(self.set_to_string(self.keys_stored))
