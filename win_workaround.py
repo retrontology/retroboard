@@ -259,7 +259,7 @@ WINDOWS_SCANCODES = [
     'CLEAR']    #254
 
 def parse_key(key):
-        if type(key) == keyboard.Key or not os.name == 'nt':
-            return key
+        if os.name == 'nt' and type(key) == keyboard.KeyCode:
+            return keyboard.KeyCode(vk=key.vk, char=WINDOWS_SCANCODES[key.vk])
         else:
             return key
