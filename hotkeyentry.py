@@ -2,6 +2,7 @@ import tkinter as tk
 from threading import Thread
 from time import sleep
 from pynput import keyboard
+from hotkey import RetroHotKey
 import win_workaround
 import os
 
@@ -77,7 +78,7 @@ class HotkeyEntry(tk.Entry):
         if len(self.keys_stored) == 0:
             return None
         else:
-            out = keyboard.HotKey(self.keys_stored, on_activate)
+            out = RetroHotKey(self.keys_stored, on_activate)
             return out
     
     @staticmethod

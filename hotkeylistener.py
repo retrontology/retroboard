@@ -1,4 +1,5 @@
 from pynput import keyboard
+from hotkey import RetroListener
 from enum import Enum
 
 class HotkeyScope(Enum):
@@ -35,7 +36,7 @@ class HotkeyListener():
             if hotkey._on_activate is None and scope == HotkeyScope.TABLE:
                 hotkey._on_activate = lambda: self.parent.play_entry(index)
             if hotkey._on_activate is not None:
-                listeners[index] = keyboard.Listener(on_press=self.for_canonical(hotkeys[index].press, index, scope), on_release=self.for_canonical(hotkeys[index].release, index, scope))
+                listeners[index] = RetroListener(on_press=self.for_canonical(hotkeys[index].press, index, scope), on_release=self.for_canonical(hotkeys[index].release, index, scope))
                 listeners[index].start()
             else:
                 listeners[index] = None

@@ -10,6 +10,7 @@ from hotkeytree import HotKeyTree
 from errorwindow import ErrorWindow
 from settingswindow import SettingsWindow
 from pynput import keyboard
+from hotkey import RetroHotKey, RetroListener
 import os
 import pickle
 import webbrowser
@@ -52,8 +53,8 @@ class RetroBoard(tk.Tk):
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
-        self.hotkey_listener.set_hotkey('stop_all', keyboard.HotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.GLOBAL)
-        self.hotkey_listener.set_hotkey('ptt', keyboard.HotKey(self.prefs['ptt'], None), HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('stop_all', RetroHotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('ptt', RetroHotKey(self.prefs['ptt'], None), HotkeyScope.GLOBAL)
         self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
         self.ptt_enable_var = tk.BooleanVar(self, self.prefs['ptt_enable'], 'ptt_enable')
@@ -285,7 +286,7 @@ class RetroBoard(tk.Tk):
         self.audio_table.clear()
         for d in data:
             if d[1]:
-                hotkey = keyboard.HotKey(d[1], None)
+                hotkey = RetroHotKey(d[1], None)
             else:
                 hotkey = None
             self.audio_table.insert('', 'end', None, hotkey, values=d[0].copy())
