@@ -98,16 +98,16 @@ WINDOWS_SCANCODES = [
     'APPS',    #93
     None,    #94
     'SLEEP',    #95
-    'NUMPAD0',    #96
-    'NUMPAD1',    #97
-    'NUMPAD2',    #98
-    'NUMPAD3',    #99
-    'NUMPAD4',    #100
-    'NUMPAD5',    #101
-    'NUMPAD6',    #102
-    'NUMPAD7',    #103
-    'NUMPAD8',    #104
-    'NUMPAD9',    #105
+    '0',    #96
+    '1',    #97
+    '2',    #98
+    '3',    #99
+    '4',    #100
+    '5',    #101
+    '6',    #102
+    '7',    #103
+    '8',    #104
+    '9',    #105
     'MULTIPLY',    #106
     'ADD',    #107
     'SEPARATOR',    #108
