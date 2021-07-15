@@ -11,7 +11,6 @@ class RetroHotKey(HotKey):
                 self._vks.add(key.vk)
             else:
                 self._vks.add(key.value.vk)
-        print(f'VKs: {self._vks}')
         self._on_activate = on_activate
 
     def press(self, key):
@@ -19,10 +18,8 @@ class RetroHotKey(HotKey):
             value = key.vk
         else:
             value = key.value.vk
-        print(f'{self._vks}|{value}')
         if value in self._vks and value not in self._state:
             self._state.add(value)
-            print(f'VKs: {self._vks} | state: {self._state}')
             if self._state == self._vks:
                 self._on_activate()
 
