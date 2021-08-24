@@ -268,7 +268,6 @@ class RetroBoard(tk.Tk):
     
     def stop_all(self):
         while len(self.playing) > 0:
-            print(len(self.playing))
             self.playing[0].stop()
     
     def file_save_callback(self):
