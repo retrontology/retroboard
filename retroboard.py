@@ -9,6 +9,7 @@ from entrywindow import EntryWindow
 from hotkeytree import HotKeyTree
 from errorwindow import ErrorWindow
 from settingswindow import SettingsWindow
+from gainwindow import GainWindow
 from pynput import keyboard
 from hotkey import RetroHotKey, RetroListener
 import os
@@ -49,7 +50,9 @@ class RetroBoard(tk.Tk):
         odev = sounddevice._get_device_id(sounddevice.default.device['output'], 'output')
         default_device = device_names[odev]
         self.primary_device = tk.StringVar(self, default_device, 'primary_device')
+        self.primary_gain = tk.DoubleVar(self, self.prefs['primary_gain'], 'primary_gain')
         self.secondary_device = tk.StringVar(self, default_device, 'secondary_device')
+        self.secondary_gain = tk.DoubleVar(self, self.prefs['secondary_gain'], 'secondary_gain')
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
@@ -93,6 +96,7 @@ class RetroBoard(tk.Tk):
 
         # Option Menu
         settings_menu = tk.Menu(self.menubar, tearoff=0)
+        settings_menu.add_command(label='Gain', command = lambda: GainWindow(self))
         settings_menu.add_command(label='Settings', command=lambda: SettingsWindow(self))
         self.menubar.add_cascade(label = 'Option', menu=settings_menu)
 
@@ -199,9 +203,9 @@ class RetroBoard(tk.Tk):
         self.ptt_thread = Thread(target=self.ptt_press).start()
 
     def get_devices(self):
-        out = [int(self.primary_device.get().split('.', 1)[0]) - 1]
+        out = [(int(self.primary_device.get().split('.', 1)[0]) - 1, self.primary_gain)]
         if self.secondary_device_enable.get():
-            out.append(int(self.secondary_device.get().split('.', 1)[0]) - 1)
+            out.append((int(self.secondary_device.get().split('.', 1)[0]) - 1), self.secondary_gain)
         return out
     
     def add_entry(self, filename, hotkeys_str='', hotkey=None):

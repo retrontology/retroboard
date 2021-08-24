@@ -6,10 +6,10 @@ from functools import partial
 
 class AudioEntry():
     
-    def __init__(self, path:str, parent, gain=0):
+    def __init__(self, path:str, parent):
         self.parent = parent
         self.path = path
-        self.gain = gain
+        self.gain = dict()
         self.frame_index = dict()
         self.segment = None
         self.streams = dict()
@@ -20,8 +20,8 @@ class AudioEntry():
 
     def detect_max_channels(self):
         device_indexes = self.parent.get_devices()
-        max_channels = sounddevice.query_devices(device_indexes[0])['max_output_channels']
-        for index in device_indexes:
+        max_channels = sounddevice.query_devices(device_indexes[0][0])['max_output_channels']
+        for index, gain in device_indexes:
             c = sounddevice.query_devices(index)['max_output_channels']
             if c < max_channels:
                 max_channels = c
@@ -37,8 +37,10 @@ class AudioEntry():
         remainder = int(self.segment.frame_count()) - self.frame_index[device_index]
         if remainder < 1:
             raise sounddevice.CallbackStop
+        gain = self.gain[device_index].get()
         valid_frames = frame_count if remainder >= frame_count else remainder
         data = numpy.array(self.segment.get_sample_slice(start_sample=self.frame_index[device_index], end_sample=self.frame_index[device_index]+valid_frames).get_array_of_samples())
+        data = numpy.vectorize(lambda x: 10**(gain/10)*x)(data)
         outdata[:valid_frames] = data.reshape(valid_frames, self.segment.channels)[:valid_frames]
         outdata[valid_frames:] = 0
         self.frame_index[device_index] += valid_frames
@@ -61,7 +63,8 @@ class AudioEntry():
         if not self.segment:
             self.load_audio()
         device_index = 0
-        for device in self.parent.get_devices():
+        for device, gain in self.parent.get_devices():
+            self.gain[device_index] = gain
             self.frame_index[device_index] = 0
             try:
                 output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.segment.array_type)

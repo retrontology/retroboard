@@ -8,6 +8,7 @@ DEFAULT_SAVE = 'default.rbd'
 DEFAULT_STOP_ALL = set([keyboard.Key.pause])
 DEFAULT_PTT = set([keyboard.KeyCode(char='v')])
 DEFAULT_PTT_ENABLE = False
+DEFAULT_GAIN = 0
 
 class Preferences(dict):
 
@@ -24,6 +25,8 @@ class Preferences(dict):
         self.setdefault('stop_all', DEFAULT_STOP_ALL)
         self.setdefault('ptt', DEFAULT_PTT)
         self.setdefault('ptt_enable', DEFAULT_PTT_ENABLE)
+        self.setdefault('primary_gain', DEFAULT_GAIN)
+        self.setdefault('secondary_gain', DEFAULT_GAIN)
 
     def load(self):
         self.clear()
