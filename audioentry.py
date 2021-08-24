@@ -40,7 +40,7 @@ class AudioEntry():
         gain = self.gain[device_index].get()
         valid_frames = frame_count if remainder >= frame_count else remainder
         data = numpy.array(self.segment.get_sample_slice(start_sample=self.frame_index[device_index], end_sample=self.frame_index[device_index]+valid_frames).get_array_of_samples())
-        data = numpy.vectorize(lambda x: 10**(gain/10)*x)(data)
+        data = numpy.vectorize(lambda x: apply_gain(x, gain))(data)
         outdata[:valid_frames] = data.reshape(valid_frames, self.segment.channels)[:valid_frames]
         outdata[valid_frames:] = 0
         self.frame_index[device_index] += valid_frames
@@ -76,4 +76,7 @@ class AudioEntry():
 
     def stop(self):
         for i in range(len(self.streams)):
-            self.streams[i].stop()
+            self.streams[i].abort()
+
+def apply_gain(input, gain):
+    return 10**(gain/10)*input
