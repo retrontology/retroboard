@@ -43,6 +43,8 @@ class RetroBoard(tk.Tk):
         self.prefs = Preferences()
         self.hotkey_listener = HotkeyListener(self)
         self._savefile = tk.StringVar(self, self.prefs['savefile'], 'savefile')
+        self.settings_window = None
+        self.gain_window = None
 
         # Device Variables
         devices = sounddevice.query_devices()
@@ -75,6 +77,20 @@ class RetroBoard(tk.Tk):
         self.create_menu()
         self.create_buttons(topframe)
         self.create_device_selection(topframe)
+    
+    def spawn_settings(self):
+        if self.settings_window:
+            self.settings_window.focus()
+            self.settings_window.lift(self)
+        else:
+            self.settings_window = SettingsWindow(self)
+
+    def spawn_gain(self):
+        if self.gain_window:
+            self.gain_window.focus()
+            self.gain_window.lift(self)
+        else:
+            self.gain_window = GainWindow(self)
 
     def create_menu(self):
         # Top Level menubar
@@ -96,8 +112,8 @@ class RetroBoard(tk.Tk):
 
         # Option Menu
         settings_menu = tk.Menu(self.menubar, tearoff=0)
-        settings_menu.add_command(label='Gain', command = lambda: GainWindow(self))
-        settings_menu.add_command(label='Settings', command=lambda: SettingsWindow(self))
+        settings_menu.add_command(label='Gain', command = self.spawn_gain)
+        settings_menu.add_command(label='Settings', command=self.spawn_settings)
         self.menubar.add_cascade(label = 'Option', menu=settings_menu)
 
     def create_audio_table(self, frame):

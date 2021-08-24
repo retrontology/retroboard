@@ -52,3 +52,4 @@ class SettingsWindow(tk.Toplevel):
         self.stopall.stop()
         self.ptt.stop()
         self.destroy()
+        self.master.settings_window = None
