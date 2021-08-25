@@ -75,8 +75,8 @@ class AudioEntry():
                 self.parent.error(e)
 
     def stop(self):
-        for i in range(len(self.streams)):
-            self.streams[i].abort()
+        for stream in self.streams.copy().values():
+            stream.abort()
 
 def apply_gain(input, gain):
     return 10**(gain/10)*input
