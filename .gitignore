@@ -130,3 +130,8 @@ dmypy.json
 test*
 *.rbd
 *.rbp
+
+bin
+lib64
+.venv
+pyvenv.cfg
