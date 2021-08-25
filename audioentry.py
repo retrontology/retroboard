@@ -13,6 +13,7 @@ class AudioEntry():
         self.frame_index = dict()
         self.segment = None
         self.streams = dict()
+        self.stop = False
     
     def load_audio(self):
         self.segment = pydub.AudioSegment.from_file(self.path)
@@ -34,6 +35,8 @@ class AudioEntry():
     def playback_callback(self, device_index, outdata, frame_count, time_info, status):
         if status:
             print(status)
+        if self.stop:
+            raise sounddevice.CallbackStop
         remainder = int(self.segment.frame_count()) - self.frame_index[device_index]
         if remainder < 1:
             raise sounddevice.CallbackStop
@@ -55,7 +58,6 @@ class AudioEntry():
             del self
 
     def play(self):
-        self.stop()
         self.playback_thread = Thread(target=self._play)
         self.playback_thread.start()
 
@@ -73,10 +75,6 @@ class AudioEntry():
                 device_index += 1
             except Exception as e:
                 self.parent.error(e)
-
-    def stop(self):
-        for stream in self.streams.copy().values():
-            stream.abort()
 
 def apply_gain(input, gain):
     return 10**(gain/10)*input

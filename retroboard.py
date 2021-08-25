@@ -267,8 +267,8 @@ class RetroBoard(tk.Tk):
         self.stop_all()
     
     def stop_all(self):
-        while len(self.playing) > 0:
-            self.playing[0].stop()
+        for clip in self.playing.copy():
+            clip.stop = True
     
     def file_save_callback(self):
         default_file = self._savefile.get()
