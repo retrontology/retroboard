@@ -112,7 +112,7 @@ class RetroBoard(tk.Tk):
 
         # Option Menu
         settings_menu = tk.Menu(self.menubar, tearoff=0)
-        settings_menu.add_command(label='Gain', command = self.spawn_gain)
+        settings_menu.add_command(label='Gain Levels', command = self.spawn_gain)
         settings_menu.add_command(label='Settings', command=self.spawn_settings)
         self.menubar.add_cascade(label = 'Option', menu=settings_menu)
 
