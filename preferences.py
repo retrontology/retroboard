@@ -1,8 +1,9 @@
 import pickle
 from pynput import keyboard
 from os.path import isfile, abspath, join, dirname
+import sys
 
-DEFAULT_DIR = dirname(abspath(__file__))
+DEFAULT_DIR = dirname(abspath(sys.argv[0]))
 DEFAULT_PREF = 'pref.rbp'
 DEFAULT_SAVE = 'default.rbd'
 DEFAULT_STOP_ALL = set([keyboard.Key.pause])

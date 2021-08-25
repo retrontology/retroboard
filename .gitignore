@@ -135,3 +135,5 @@ bin
 lib64
 .venv
 pyvenv.cfg
+retroboard.build
+retroboard.dist

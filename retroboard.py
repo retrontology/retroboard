@@ -18,6 +18,7 @@ import webbrowser
 from time import sleep
 from threading import Thread
 from preferences import *
+import sys
 
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 
@@ -278,7 +279,7 @@ class RetroBoard(tk.Tk):
             self.file_save_as_callback()
 
     def file_save_as_callback(self):
-        filename = filedialog.asksaveasfilename(initialfile=DEFAULT_SAVE, initialdir=os.path.dirname(os.path.abspath(__file__)))
+        filename = filedialog.asksaveasfilename(initialfile=DEFAULT_SAVE, initialdir=os.path.dirname(os.path.abspath(sys.argv[0])))
         if filename:
             self.save_file(filename)
 
