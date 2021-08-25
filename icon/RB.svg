@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64.0px"
+   height="64.0px"
+   viewBox="0 0 64.0 64.0"
+   version="1.1"
+   id="SVGRoot"
+   sodipodi:docname="RB.svg"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview19747"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="8"
+     inkscape:cx="32.3125"
+     inkscape:cy="34.0625"
+     inkscape:window-width="1600"
+     inkscape:window-height="848"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g32333"
+     objecttolerance="20">
+    <inkscape:grid
+       type="xygrid"
+       id="grid19753"
+       dotted="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs19742">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 32 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="64 : 32 : 1"
+       inkscape:persp3d-origin="32 : 21.333333 : 1"
+       id="perspective31381" />
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       height="1.0378221"
+       width="1.0376456"
+       y="-0.018911072"
+       x="-0.018822792"
+       inkscape:label="Outline"
+       id="filter37083">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="0.4"
+         result="blur1"
+         id="feGaussianBlur37059" />
+      <feComposite
+         in="blur1"
+         in2="SourceGraphic"
+         operator="xor"
+         result="composite1"
+         id="feComposite37061" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 -0 "
+         result="colormatrix1"
+         id="feColorMatrix37063" />
+      <feGaussianBlur
+         stdDeviation="0.01"
+         result="blur2"
+         id="feGaussianBlur37065" />
+      <feComposite
+         in="blur2"
+         in2="blur2"
+         operator="over"
+         result="composite2"
+         id="feComposite37067" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 -0 "
+         result="colormatrix2"
+         id="feColorMatrix37069" />
+      <feGaussianBlur
+         stdDeviation="0.01"
+         result="blur3"
+         id="feGaussianBlur37071" />
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 5 -1 "
+         result="colormatrix3"
+         id="feColorMatrix37073" />
+      <feFlood
+         flood-opacity="1"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood37075" />
+      <feComposite
+         in="flood"
+         in2="colormatrix3"
+         k2="1"
+         operator="in"
+         result="composite3"
+         id="feComposite37077" />
+      <feComposite
+         in="SourceGraphic"
+         in2="colormatrix3"
+         operator="out"
+         result="composite4"
+         id="feComposite37079" />
+      <feComposite
+         in="composite4"
+         in2="composite3"
+         k2="1"
+         k3="1"
+         operator="arithmetic"
+         result="composite5"
+         id="feComposite37081" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g31581"
+       transform="translate(-5.4791757,-1.3489456)"
+       style="fill:#800080">
+      <g
+         id="g32333">
+        <g
+           id="g32339"
+           style="filter:url(#filter37083)"
+           transform="matrix(1.0928775,0,0,1.0751743,-3.4809721,-2.5069821)">
+          <text
+             xml:space="preserve"
+             style="font-weight:bold;font-stretch:condensed;font-size:74.6667px;line-height:1.25;font-family:'Open Sans Condensed';-inkscape-font-specification:'Open Sans Condensed,  Bold Condensed';fill:#800080"
+             x="-47.890644"
+             y="60"
+             id="text27953"
+             transform="scale(-1,1)"><tspan
+               sodipodi:role="line"
+               id="tspan27951"
+               x="-47.890644"
+               y="60">R</tspan></text>
+          <text
+             xml:space="preserve"
+             style="font-weight:bold;font-stretch:condensed;font-size:74.6667px;line-height:1.25;font-family:'Open Sans Condensed';-inkscape-font-specification:'Open Sans Condensed,  Bold Condensed';fill:#800080"
+             x="29"
+             y="60"
+             id="text30075"><tspan
+               sodipodi:role="line"
+               id="tspan30073"
+               x="29"
+               y="60">B</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
