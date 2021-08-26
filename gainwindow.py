@@ -29,3 +29,4 @@ class GainWindow(tk.Toplevel):
         self.master.prefs['primary_gain'] = self.master.primary_gain.get()
         self.master.prefs['secondary_gain'] = self.master.secondary_gain.get()
         self.destroy()
+        self.master.gain_window = None
