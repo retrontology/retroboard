@@ -202,9 +202,9 @@ class RetroBoard(tk.Tk):
         if len(keys) > 0 and self.ptt_enable_var.get() and not self.ptt_pressed:
             self.ptt_pressed = True
             kbc = keyboard.Controller()
-            for key in keys:
-                kbc.press(key)
             while len(self.playing) > 0:
+                for key in keys:
+                    kbc.press(key)
                 sleep(0.1)
             for key in keys:
                 kbc.release(key)
