@@ -225,7 +225,7 @@ class RetroBoard(tk.Tk):
     def get_devices(self):
         out = [(int(self.primary_device.get().split('.', 1)[0]) - 1, self.primary_gain)]
         if self.secondary_device_enable.get():
-            out.append((int(self.secondary_device.get().split('.', 1)[0]) - 1), self.secondary_gain)
+            out.append(((int(self.secondary_device.get().split('.', 1)[0]) - 1), self.secondary_gain))
         return out
     
     def add_entry(self, filename, hotkeys_str='', hotkey=None):
