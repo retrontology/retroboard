@@ -58,7 +58,7 @@ class AudioEntry():
             del self
 
     def play(self):
-        self.playback_thread = Thread(target=self._play)
+        self.playback_thread = Thread(target=self._play, daemon=True)
         self.playback_thread.start()
 
     def _play(self):

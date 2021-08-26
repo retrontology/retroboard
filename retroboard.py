@@ -218,7 +218,8 @@ class RetroBoard(tk.Tk):
         af = AudioEntry(filename, self)
         self.playing.append(af)
         af.play()
-        self.ptt_thread = Thread(target=self.ptt_press).start()
+        self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
+        self.ptt_thread.start()
 
     def get_devices(self):
         out = [(int(self.primary_device.get().split('.', 1)[0]) - 1, self.primary_gain)]

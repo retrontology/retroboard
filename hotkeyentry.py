@@ -24,7 +24,7 @@ class HotkeyEntry(tk.Entry):
     
     def left_click_callback(self, key):
         if not self.capture:
-            self.capture_process = Thread(target=self.capture_hotkeys)
+            self.capture_process = Thread(target=self.capture_hotkeys, daemon=True)
             self.capture_process.start()
 
     def right_click_callback(self, key):
