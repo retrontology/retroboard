@@ -8,11 +8,12 @@ class GainWindow(tk.Toplevel):
     
     def __init__(self, master=None):
         super().__init__(master)
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.master = master
         self.minsize(450,80)
         self.setup_widgets()
         self.resizable(False, False)
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.focus()
     
     def setup_widgets(self):
         topframe = tk.Frame(self)

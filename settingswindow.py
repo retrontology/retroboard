@@ -11,6 +11,7 @@ class SettingsWindow(tk.Toplevel):
         self.minsize(450,80)
         self.setup_widgets()
         self.resizable(False, False)
+        self.focus()
 
     def setup_widgets(self):
         # Top Level Frame
