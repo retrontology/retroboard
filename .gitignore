@@ -137,3 +137,5 @@ lib64
 pyvenv.cfg
 retroboard.build
 retroboard.dist
+retroboard.exe
+Scripts
