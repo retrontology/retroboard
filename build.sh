@@ -5,4 +5,4 @@ python -m venv .
 source bin/activate
 pip install -r requirements.txt
 pip install nuitka
-python -m nuitka --onefile --follow-imports --plugin-enable=tk-inter --plugin-enable=numpy --include-package pynput --include-package Xlib --include-data-file=icon/RB.png=icon/RB.png --linux-onefile-icon=icon/RB.png retroboard.py
+python -m nuitka --onefile --remove-output --assume-yes-for-downloads --follow-imports --plugin-enable=tk-inter --plugin-enable=numpy --include-package pynput --include-package Xlib --include-data-file=icon/RB.png=icon/RB.png --linux-onefile-icon=icon/RB.xpm retroboard.py
