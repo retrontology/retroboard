@@ -21,12 +21,13 @@ from preferences import *
 import sys
 
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
+ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
 
 class RetroBoard(tk.Tk):
 
     def __init__(self, master=None):
         super().__init__(master)
-        self.iconphoto(True, tk.PhotoImage(file='icon/RB.png'))
+        self.iconphoto(True, tk.PhotoImage(file=ICON_FILE))
         self.geometry("500x600")
         self.title('retroboard')
         self.playing = []
