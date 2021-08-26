@@ -177,7 +177,7 @@ class RetroBoard(tk.Tk):
         # Primary output
         primary_device_label = tk.Label(device_frame, text='Primary Output Device')
         primary_device_label.grid(column=0, row=0, sticky='w')
-        primary_device_menu = ttk.Combobox(device_frame, textvariable=self.primary_device, values=device_names, state='readonly')
+        primary_device_menu = ttk.Combobox(device_frame, textvariable=self.primary_device, values=device_names, state='readonly', background='light gray')
         primary_device_menu.grid(column=0, row=1, sticky='nsew', in_=device_frame)
 
         # Secondary output
@@ -186,7 +186,7 @@ class RetroBoard(tk.Tk):
         secondary_device_frame = tk.Frame(device_frame)
         secondary_device_frame.columnconfigure(0, weight=1)
         secondary_device_frame.grid(column=0, row=3, sticky='nsew', in_=device_frame)
-        self.secondary_device_menu = ttk.Combobox(secondary_device_frame, textvariable=self.secondary_device, values=device_names, state='readonly')
+        self.secondary_device_menu = ttk.Combobox(secondary_device_frame, textvariable=self.secondary_device, values=device_names, state='readonly', background='light gray')
         self.secondary_device_menu.grid(column=0, row=0, sticky='nsew')
         secondary_device_enable_button = tk.Checkbutton(secondary_device_frame, text='Use', variable=self.secondary_device_enable, command=self.toggle_secondary_device_enable)
         self.toggle_secondary_device_enable()
@@ -194,7 +194,7 @@ class RetroBoard(tk.Tk):
         
     def toggle_secondary_device_enable(self):
         if self.secondary_device_enable.get():
-            self.secondary_device_menu.configure(state='normal')
+            self.secondary_device_menu.configure(state='readonly')
         else:
             self.secondary_device_menu.configure(state='disabled')
     
