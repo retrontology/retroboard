@@ -20,6 +20,7 @@ from threading import Thread
 from preferences import *
 import sys
 
+VERSION = '1.0.1'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
 
@@ -29,7 +30,7 @@ class RetroBoard(tk.Tk):
         super().__init__(master)
         self.iconphoto(True, tk.PhotoImage(file=ICON_FILE))
         self.geometry("500x600")
-        self.title('retroboard')
+        self.title(f'retroboard | {VERSION}')
         self.playing = []
         self.setup_variables()
         self.setup_widgets()
