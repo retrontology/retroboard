@@ -7,7 +7,6 @@ from tempfile import NamedTemporaryFile
 import sys
 from pydub.logging_utils import log_conversion, log_subprocess_output
 from pydub.utils import mediainfo_json, fsdecode, _fd_or_path_or_tempfile
-from collections import namedtuple
 
 from io import BytesIO
 
@@ -286,8 +285,12 @@ class FixedAudioSegment(AudioSegment):
 
         log_conversion(conversion_command)
 
+        if sys.platform == 'win32':
+            creationflags = subprocess.CREATE_NO_WINDOW
+        else:
+            creationflags = 0
         with open(os.devnull, 'rb') as devnull:
-            p = subprocess.Popen(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
+            p = subprocess.Popen(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=creationflags)
         p_out, p_err = p.communicate()
 
         log_subprocess_output(p_out)
