@@ -3,6 +3,8 @@ import sounddevice
 import numpy
 from threading import Thread
 from functools import partial
+from errorwindow import ErrorWindow
+from pyinstaller_audio_segment import FixedAudioSegment
 
 class AudioEntry():
     
@@ -16,7 +18,7 @@ class AudioEntry():
         self.stop = False
     
     def load_audio(self):
-        self.segment = pydub.AudioSegment.from_file(self.path)
+        self.segment = FixedAudioSegment.from_file_using_temporary_files(self.path)
         self.detect_max_channels()
 
     def detect_max_channels(self):
