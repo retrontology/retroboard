@@ -15,15 +15,18 @@ class AudioEntry():
         self.streams = dict()
         self.stop = False
         self.audio_container = av.open(self.path)
-        self.data = None
-        self.channels = 2
+        self.frames = None
     
     def load_audio(self):
-        self.data = []
+        self.frames = []
         for frame in self.audio_container.decode(audio=0):
-            self.data.append(frame.to_ndarray())
+            self.frames.append(frame)
+        self.get_channels()
         #self.detect_max_channels()
     
+    def get_channels(self):
+        self.channels = len(self.frames[0].layout.channels)
+
     def get_audio_stream(self):
         return self.audio_container.streams.get(audio=0)[0]
 
@@ -38,24 +41,30 @@ class AudioEntry():
             self.segment = self.segment.set_channels(max_channels) """
     
     def clear_audio(self):
-        self.data = None
+        self.frames = None
     
     def playback_callback(self, device_index, outdata, frame_count, time_info, status):
         if status:
             print(status)
         if self.stop:
             raise sounddevice.CallbackStop
-        remainder = int(self.get_audio_stream().frames) - self.frame_index[device_index]
+        remainder = len(self.frames) - self.frame_index[device_index]
         if remainder < 1:
             raise sounddevice.CallbackStop
         gain = self.gain[device_index].get()
         valid_frames = frame_count if remainder >= frame_count else remainder
-        data = np.array(self.data[self.frame_index[device_index]:self.frame_index[device_index]+valid_frames])
-        #data = np.array(self.segment.get_sample_slice(start_sample=self.frame_index[device_index], end_sample=self.frame_index[device_index]+valid_frames).get_array_of_samples())
+        
+        data = self.frames[self.frame_index[device_index]].to_ndarray()
+        if remainder > 1:
+            for frame in self.frames[self.frame_index[device_index]+1:self.frame_index[device_index]+valid_frames]:
+                data = np.append(data, frame.to_ndarray(), 1)
+        data = np.transpose(data)
+
         data = np.vectorize(lambda x: apply_gain(x, gain))(data)
-        #outdata[:valid_frames] = data.reshape(valid_frames, self.channels)[:valid_frames]
+        outdata[:valid_frames] = data[:valid_frames]
         outdata[valid_frames:] = 0
         self.frame_index[device_index] += valid_frames
+        print(outdata)
     
     def playback_finished(self, device_index):
         self.streams.pop(device_index)
@@ -71,15 +80,15 @@ class AudioEntry():
         self.playback_thread.start()
 
     def _play(self):
-        if not self.data:
+        if not self.frames:
             self.load_audio()
         device_index = 0
         for device, gain in self.parent.get_devices():
             self.gain[device_index] = gain
             self.frame_index[device_index] = 0
             try:
-                print(self.get_audio_stream().time_base)
-                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.channels, samplerate=self.get_audio_stream().time_base.denominator / self.get_audio_stream().time_base.numerator, dtype=self.data[0].dtype)
+                print(self.frames[0].sample_rate)
+                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.channels, samplerate=self.frames[0].sample_rate, dtype=self.frames[0].to_ndarray().dtype)
                 self.streams[device_index] = output
                 output.start()
                 device_index += 1
