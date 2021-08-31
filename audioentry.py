@@ -1,6 +1,6 @@
-import pydub
+import av
 import sounddevice
-import numpy
+import numpy as np
 from threading import Thread
 from functools import partial
 from errorwindow import ErrorWindow
@@ -12,40 +12,48 @@ class AudioEntry():
         self.path = path
         self.gain = dict()
         self.frame_index = dict()
-        self.segment = None
         self.streams = dict()
         self.stop = False
+        self.audio_container = av.open(self.path)
+        self.data = None
+        self.channels = 2
     
     def load_audio(self):
-        self.segment = pydub.AudioSegment.from_file(self.path)
-        self.detect_max_channels()
+        self.data = []
+        for frame in self.audio_container.decode(audio=0):
+            self.data.append(frame.to_ndarray())
+        #self.detect_max_channels()
+    
+    def get_audio_stream(self):
+        return self.audio_container.streams.get(audio=0)[0]
 
-    def detect_max_channels(self):
+    """ def detect_max_channels(self):
         device_indexes = self.parent.get_devices()
-        max_channels = sounddevice.query_devices(device_indexes[0][0])['max_output_channels']
+        max_channels = self.audio_container.
         for index, gain in device_indexes:
             c = sounddevice.query_devices(index)['max_output_channels']
             if c < max_channels:
                 max_channels = c
         if max_channels < self.segment.channels:
-            self.segment = self.segment.set_channels(max_channels)
+            self.segment = self.segment.set_channels(max_channels) """
     
     def clear_audio(self):
-        self.segment = None
+        self.data = None
     
     def playback_callback(self, device_index, outdata, frame_count, time_info, status):
         if status:
             print(status)
         if self.stop:
             raise sounddevice.CallbackStop
-        remainder = int(self.segment.frame_count()) - self.frame_index[device_index]
+        remainder = int(self.get_audio_stream().frames) - self.frame_index[device_index]
         if remainder < 1:
             raise sounddevice.CallbackStop
         gain = self.gain[device_index].get()
         valid_frames = frame_count if remainder >= frame_count else remainder
-        data = numpy.array(self.segment.get_sample_slice(start_sample=self.frame_index[device_index], end_sample=self.frame_index[device_index]+valid_frames).get_array_of_samples())
-        data = numpy.vectorize(lambda x: apply_gain(x, gain))(data)
-        outdata[:valid_frames] = data.reshape(valid_frames, self.segment.channels)[:valid_frames]
+        data = np.array(self.data[self.frame_index[device_index]:self.frame_index[device_index]+valid_frames])
+        #data = np.array(self.segment.get_sample_slice(start_sample=self.frame_index[device_index], end_sample=self.frame_index[device_index]+valid_frames).get_array_of_samples())
+        data = np.vectorize(lambda x: apply_gain(x, gain))(data)
+        #outdata[:valid_frames] = data.reshape(valid_frames, self.channels)[:valid_frames]
         outdata[valid_frames:] = 0
         self.frame_index[device_index] += valid_frames
     
@@ -63,14 +71,15 @@ class AudioEntry():
         self.playback_thread.start()
 
     def _play(self):
-        if not self.segment:
+        if not self.data:
             self.load_audio()
         device_index = 0
         for device, gain in self.parent.get_devices():
             self.gain[device_index] = gain
             self.frame_index[device_index] = 0
             try:
-                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, samplerate=self.segment.frame_rate, channels=self.segment.channels, dtype=self.segment.array_type)
+                print(self.get_audio_stream().time_base)
+                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.channels, samplerate=self.get_audio_stream().time_base.denominator / self.get_audio_stream().time_base.numerator, dtype=self.data[0].dtype)
                 self.streams[device_index] = output
                 output.start()
                 device_index += 1
