@@ -3,10 +3,11 @@ from __future__ import division
 from pydub.audio_segment import AudioSegment, AUDIO_FILE_EXT_ALIASES, fix_wav_headers
 import os
 import subprocess
-from tempfile import NamedTemporaryFile
 import sys
-from pydub.logging_utils import log_conversion, log_subprocess_output
-from pydub.utils import mediainfo_json, fsdecode, _fd_or_path_or_tempfile
+from pydub.logging_utils import log_conversion
+from pydub.utils import fsdecode, _fd_or_path_or_tempfile, get_prober_name, get_extra_info
+import json
+import re
 
 from io import BytesIO
 
@@ -32,7 +33,6 @@ class FixedAudioSegment(AudioSegment):
         except TypeError:
             filename = None
         file, close_file = _fd_or_path_or_tempfile(file, 'rb', tempfile=False)
-
         if format:
             format = format.lower()
             format = AUDIO_FILE_EXT_ALIASES.get(format, format)
@@ -94,7 +94,7 @@ class FixedAudioSegment(AudioSegment):
         read_ahead_limit = kwargs.get('read_ahead_limit', -1)
         if filename:
             conversion_command += ["-i", filename]
-            stdin_parameter = None
+            stdin_parameter = subprocess.DEVNULL
             stdin_data = None
         else:
             if cls.converter == 'ffmpeg':
@@ -109,6 +109,7 @@ class FixedAudioSegment(AudioSegment):
             info = None
         else:
             info = mediainfo_json(orig_file, read_ahead_limit=read_ahead_limit)
+
         if info:
             audio_streams = [x for x in info['streams']
                              if x['codec_type'] == 'audio']
@@ -143,12 +144,14 @@ class FixedAudioSegment(AudioSegment):
         if parameters is not None:
             # extend arguments with arbitrary set
             conversion_command.extend(parameters)
-
         log_conversion(conversion_command)
 
-        with open(os.devnull, 'rb') as devnull:
-            p = subprocess.Popen(conversion_command, stdin=devnull,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if sys.platform == 'win32':
+            creation_parameter = subprocess.REALTIME_PRIORITY_CLASS
+        else:
+            creation_parameter = 0
+
+        p = subprocess.Popen(conversion_command, stdin=stdin_parameter, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=creation_parameter)
         p_out, p_err = p.communicate(input=stdin_data)
 
         if p.returncode != 0 or len(p_out) == 0:
@@ -175,145 +178,81 @@ class FixedAudioSegment(AudioSegment):
         else:
             return obj[0:duration * 1000]
 
-    @classmethod
-    def from_file_using_temporary_files(cls, file, format=None, codec=None, parameters=None, start_second=None, duration=None, **kwargs):
-        orig_file = file
-        file, close_file = _fd_or_path_or_tempfile(file, 'rb', tempfile=False)
-
-        if format:
-            format = format.lower()
-            format = AUDIO_FILE_EXT_ALIASES.get(format, format)
-
-        def is_format(f):
-            f = f.lower()
-            if format == f:
-                return True
-            if isinstance(orig_file, basestring):
-                return orig_file.lower().endswith(".{0}".format(f))
-            if isinstance(orig_file, bytes):
-                return orig_file.lower().endswith((".{0}".format(f)).encode('utf8'))
-            return False
-
-        if is_format("wav"):
-            try:
-                obj = cls._from_safe_wav(file)
-                if close_file:
-                    file.close()
-                if start_second is None and duration is None:
-                    return obj
-                elif start_second is not None and duration is None:
-                    return obj[start_second*1000:]
-                elif start_second is None and duration is not None:
-                    return obj[:duration*1000]
-                else:
-                    return obj[start_second*1000:(start_second+duration)*1000]
-            except:
-                file.seek(0)
-        elif is_format("raw") or is_format("pcm"):
-            sample_width = kwargs['sample_width']
-            frame_rate = kwargs['frame_rate']
-            channels = kwargs['channels']
-            metadata = {
-                'sample_width': sample_width,
-                'frame_rate': frame_rate,
-                'channels': channels,
-                'frame_width': channels * sample_width
-            }
-            obj = cls(data=file.read(), metadata=metadata)
-            if close_file:
-                file.close()
-            if start_second is None and duration is None:
-                return obj
-            elif start_second is not None and duration is None:
-                return obj[start_second * 1000:]
-            elif start_second is None and duration is not None:
-                return obj[:duration * 1000]
-            else:
-                return obj[start_second * 1000:(start_second + duration) * 1000]
-
-        input_file = NamedTemporaryFile(mode='wb', delete=False)
-        try:
-            input_file.write(file.read())
-        except(OSError):
-            input_file.flush()
-            input_file.close()
-            input_file = NamedTemporaryFile(mode='wb', delete=False, buffering=2 ** 31 - 1)
-            if close_file:
-                file.close()
-            close_file = True
-            file = open(orig_file, buffering=2 ** 13 - 1, mode='rb')
-            reader = file.read(2 ** 31 - 1)
-            while reader:
-                input_file.write(reader)
-                reader = file.read(2 ** 31 - 1)
-        input_file.flush()
+def mediainfo_json(filepath, read_ahead_limit=-1):
+    """Return json dictionary with media info(codec, duration, size, bitrate...) from filepath
+    """
+    prober = get_prober_name()
+    command_args = [
+        "-v", "info",
+        "-show_format",
+        "-show_streams",
+    ]
+    try:
+        command_args += [fsdecode(filepath)]
+        stdin_parameter = subprocess.DEVNULL
+        stdin_data = None
+    except TypeError:
+        if prober == 'ffprobe':
+            command_args += ["-read_ahead_limit", str(read_ahead_limit),
+                             "cache:pipe:0"]
+        else:
+            command_args += ["-"]
+        stdin_parameter = subprocess.PIPE
+        file, close_file = _fd_or_path_or_tempfile(filepath, 'rb', tempfile=False)
+        file.seek(0)
+        stdin_data = file.read()
         if close_file:
             file.close()
 
-        output = NamedTemporaryFile(mode="rb", delete=False)
+    command = [prober, '-of', 'json'] + command_args
 
-        conversion_command = [cls.converter,
-                              '-y',  # always overwrite existing files
-                              ]
+    if sys.platform == 'win32':
+        creation_parameter = subprocess.REALTIME_PRIORITY_CLASS
+    else:
+        creation_parameter = 0
 
-        # If format is not defined
-        # ffmpeg/avconv will detect it automatically
-        if format:
-            conversion_command += ["-f", format]
+    res = subprocess.Popen(command, stdin=stdin_parameter, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=creation_parameter)
+    output, stderr = res.communicate(input=stdin_data)
+    output = output.decode("utf-8", 'ignore')
+    stderr = stderr.decode("utf-8", 'ignore')
 
-        if codec:
-            # force audio decoder
-            conversion_command += ["-acodec", codec]
+    info = json.loads(output)
 
-        conversion_command += [
-            "-i", input_file.name,  # input_file options (filename last)
-            "-vn",  # Drop any video streams if there are any
-            "-f", "wav"  # output options (filename last)
-        ]
+    if not info:
+        # If ffprobe didn't give any information, just return it
+        # (for example, because the file doesn't exist)
+        return info
 
-        if start_second is not None:
-            conversion_command += ["-ss", str(start_second)]
+    extra_info = get_extra_info(stderr)
 
-        if duration is not None:
-            conversion_command += ["-t", str(duration)]
+    audio_streams = [x for x in info['streams'] if x['codec_type'] == 'audio']
+    if len(audio_streams) == 0:
+        return info
 
-        conversion_command += [output.name]
+    # We just operate on the first audio stream in case there are more
+    stream = audio_streams[0]
 
-        if parameters is not None:
-            # extend arguments with arbitrary set
-            conversion_command.extend(parameters)
+    def set_property(stream, prop, value):
+        if prop not in stream or stream[prop] == 0:
+            stream[prop] = value
 
-        log_conversion(conversion_command)
-
-        if sys.platform == 'win32':
-            creationflags = subprocess.CREATE_NO_WINDOW
-        else:
-            creationflags = 0
-        with open(os.devnull, 'rb') as devnull:
-            p = subprocess.Popen(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=creationflags)
-        p_out, p_err = p.communicate()
-
-        log_subprocess_output(p_out)
-        log_subprocess_output(p_err)
-
-        try:
-            if p.returncode != 0:
-                raise CouldntDecodeError(
-                    "Decoding failed. ffmpeg returned error code: {0}\n\nOutput from ffmpeg/avlib:\n\n{1}".format(
-                        p.returncode, p_err.decode(errors='ignore') ))
-            obj = cls._from_safe_wav(output)
-        finally:
-            input_file.close()
-            output.close()
-            os.unlink(input_file.name)
-            os.unlink(output.name)
-
-        if start_second is None and duration is None:
-            return obj
-        elif start_second is not None and duration is None:
-            return obj[0:]
-        elif start_second is None and duration is not None:
-            return obj[:duration * 1000]
-        else:
-            return obj[0:duration * 1000]
-
+    for token in extra_info[stream['index']]:
+        m = re.match('([su]([0-9]{1,2})p?) \(([0-9]{1,2}) bit\)$', token)
+        m2 = re.match('([su]([0-9]{1,2})p?)( \(default\))?$', token)
+        if m:
+            set_property(stream, 'sample_fmt', m.group(1))
+            set_property(stream, 'bits_per_sample', int(m.group(2)))
+            set_property(stream, 'bits_per_raw_sample', int(m.group(3)))
+        elif m2:
+            set_property(stream, 'sample_fmt', m2.group(1))
+            set_property(stream, 'bits_per_sample', int(m2.group(2)))
+            set_property(stream, 'bits_per_raw_sample', int(m2.group(2)))
+        elif re.match('(flt)p?( \(default\))?$', token):
+            set_property(stream, 'sample_fmt', token)
+            set_property(stream, 'bits_per_sample', 32)
+            set_property(stream, 'bits_per_raw_sample', 32)
+        elif re.match('(dbl)p?( \(default\))?$', token):
+            set_property(stream, 'sample_fmt', token)
+            set_property(stream, 'bits_per_sample', 64)
+            set_property(stream, 'bits_per_raw_sample', 64)
+    return info
