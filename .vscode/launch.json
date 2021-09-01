@@ -23,7 +23,7 @@
             "name": "PowerShell Build Script",
             "type": "PowerShell",
             "request": "launch",
-            "script": "build.ps1",
+            "script": "${workspaceFolder}/build.ps1",
             "cwd": "${workspaceFolder}"
         }
     ]
