@@ -8,11 +8,9 @@ class AVBuffer():
         self.exhausted = False
         self.init_buffer()
     
-    def __del__(self):
-        del self._buffer
-    
     def init_buffer(self):
-        self._frames = av.open(self.path).decode(audio=0)
+        self._container = av.open(self.path)
+        self._frames = self._container.decode(audio=0)
         frame = self._frames.__next__()
         self.channels = len(frame.layout.channels)
         self.sample_rate = frame.sample_rate
@@ -28,6 +26,7 @@ class AVBuffer():
                 self._buffer = np.append(self._buffer, np.transpose(self._frames.__next__().to_ndarray()), 0)
             except StopIteration as e:
                 self.exhausted = True
+                self._container.close()
                 break
         if size > len(self._buffer):
             size = len(self._buffer)
