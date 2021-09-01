@@ -36,6 +36,3 @@ class AVBuffer():
     
     def close(self):
         self._container.close()
-        del self._container
-        del self._frames
-        del self._buffer
