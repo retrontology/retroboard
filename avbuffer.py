@@ -26,10 +26,16 @@ class AVBuffer():
                 self._buffer = np.append(self._buffer, np.transpose(self._frames.__next__().to_ndarray()), 0)
             except StopIteration as e:
                 self.exhausted = True
-                self._container.close()
+                self.close()
                 break
         if size > len(self._buffer):
             size = len(self._buffer)
         out = self._buffer[:size]
         self._buffer = self._buffer[size:]
         return out
+    
+    def close(self):
+        self._container.close()
+        del self._container
+        del self._frames
+        del self._buffer

@@ -10,7 +10,6 @@ class AudioEntry():
         self.path = path
         self.parent = parent
         self.gain = dict()
-        self.frame_index = dict()
         self.streams = dict()
         self.stop = False
         self.buffer = dict()
@@ -31,9 +30,12 @@ class AudioEntry():
         outdata[frame_count:] = 0
     
     def playback_finished(self, device_index):
-        self.streams.pop(device_index)
+        self.streams.pop(device_index).close()
+        self.buffer.pop(device_index).close()
+        self.gain.pop(device_index)
         if self in self.parent.playing:
             self.parent.playing.remove(self)
+        del self
 
     def play(self):
         self.playback_thread = Thread(target=self._play, daemon=True)
