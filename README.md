@@ -1,10 +1,10 @@
 # retroboard
 
 ## Description
-Python recreation of EXP Soundboard. It uses pydub (with ffmpeg) to read the audio files, sounddevice (python PortAudio bindings) to play them, and pynput for the hotkeys.
+Python recreation of EXP Soundboard. It uses pyav to read the audio files, sounddevice (python PortAudio bindings) to play them, and pynput for the hotkeys.
 
 ## Requirements
-Requires ffmpeg if audio is a format other than WAV or RAW. The python requirements are listed in ```requirements.txt```
+The python requirements are listed in ```requirements.txt```
 
 ## Installation
 ### Clone the repo

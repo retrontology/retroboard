@@ -20,7 +20,7 @@ from threading import Thread
 from preferences import *
 import sys
 
-VERSION = '1.0.1'
+VERSION = '1.1.0'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
 
