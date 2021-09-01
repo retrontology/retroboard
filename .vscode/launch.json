@@ -5,11 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Retroboard",
             "type": "python",
             "request": "launch",
             "program": "retroboard.py",
             "console": "integratedTerminal"
+        },
+        {
+            "type": "bashdb",
+            "request": "launch",
+            "name": "Unix Build Script",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build.sh",
+            "args": []
+        },
+        {
+            "name": "PowerShell Build Script",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "build.ps1",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
