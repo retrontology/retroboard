@@ -7,12 +7,13 @@ from avbuffer import AVBuffer
 class AudioEntry():
     
     def __init__(self, path:str, parent):
+        self.path = path
         self.parent = parent
         self.gain = dict()
         self.frame_index = dict()
         self.streams = dict()
         self.stop = False
-        self.buffer = AVBuffer(path)
+        self.buffer = dict()
     
     def playback_callback(self, device_index, outdata, frame_count, time_info, status):
         if status:
@@ -20,7 +21,7 @@ class AudioEntry():
         if self.stop:
             raise sounddevice.CallbackStop
         
-        data = self.buffer.read(frame_count)
+        data = self.buffer[device_index].read(frame_count)
         if len(data) < frame_count:
             frame_count = len(data)
             self.stop = True
@@ -42,8 +43,9 @@ class AudioEntry():
         device_index = 0
         for device, gain in self.parent.get_devices():
             self.gain[device_index] = gain
+            self.buffer[device_index] = AVBuffer(self.path)
             try:
-                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.buffer.channels, samplerate=self.buffer.sample_rate, dtype=self.buffer.dtype)
+                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.buffer[device_index].channels, samplerate=self.buffer[device_index].sample_rate, dtype=self.buffer[device_index].dtype)
                 self.streams[device_index] = output
                 output.start()
                 device_index += 1

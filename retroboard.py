@@ -11,7 +11,7 @@ from errorwindow import ErrorWindow
 from settingswindow import SettingsWindow
 from gainwindow import GainWindow
 from pynput import keyboard
-from hotkey import RetroHotKey, RetroListener
+from hotkey import RetroHotKey
 import os
 import pickle
 import webbrowser
@@ -19,6 +19,7 @@ from time import sleep
 from threading import Thread
 from preferences import *
 import sys
+
 
 VERSION = '1.1.0'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
