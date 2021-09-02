@@ -18,7 +18,7 @@ class AVBuffer():
             self.channels = self.max_channels
         else:
             self.channels = len(frame.layout.channels)
-        self.resampler = av.audio.resampler.AudioResampler(format=None, layout=av.audio.layout.AudioLayout(self.channels), rate=self.sample_rate)
+        self.resampler = av.audio.resampler.AudioResampler(format='s16p', layout=av.audio.layout.AudioLayout(self.channels), rate=self.sample_rate)
         frame.pts = None
         frame = self.resampler.resample(frame)
         frame = frame.to_ndarray()
