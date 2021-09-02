@@ -12,14 +12,6 @@
             "console": "integratedTerminal"
         },
         {
-            "type": "bashdb",
-            "request": "launch",
-            "name": "Unix Build Script",
-            "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/build.sh",
-            "args": []
-        },
-        {
             "name": "PowerShell Build Script",
             "type": "PowerShell",
             "request": "launch",
