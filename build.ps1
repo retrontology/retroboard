@@ -1,3 +1,11 @@
+$build_dirs = @('bin', 'build', 'dist', 'include', 'Include', 'lib', 'lib64', 'Lib', 'Lib64', 'Scripts', 'share')
+for($i=0; $i -lt $build_dirs.length; $i++)
+{
+    if (Test-Path -Path $build_dirs[$i])
+    {
+        rm -r -Force $build_dirs[$i]
+    }
+}
 python -m venv .
 . .\Scripts\Activate.ps1
 pip install -r requirements.txt
