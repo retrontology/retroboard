@@ -21,7 +21,7 @@ from preferences import *
 import sys
 
 
-VERSION = '1.1.0'
+VERSION = '1.1.1'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
 
@@ -229,7 +229,7 @@ class RetroBoard(tk.Tk):
         primary_info = sounddevice.query_devices(primary_index)
         out = [(primary_index, primary_info['default_samplerate'], primary_info['max_output_channels'], self.primary_gain)]
         if self.secondary_device_enable.get():
-            secondary_index = int(self.primary_device.get().split('.', 1)[0]) - 1
+            secondary_index = int(self.secondary_device.get().split('.', 1)[0]) - 1
             secondary_info = sounddevice.query_devices(secondary_index)
             out.append((secondary_index, secondary_info['default_samplerate'], secondary_info['max_output_channels'], self.secondary_gain))
         return out
