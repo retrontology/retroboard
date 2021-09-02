@@ -43,9 +43,9 @@ class AudioEntry():
 
     def _play(self):
         device_index = 0
-        for device, gain in self.parent.get_devices():
+        for device, sample_rate, max_channels, gain in self.parent.get_devices():
             self.gain[device_index] = gain
-            self.buffer[device_index] = AVBuffer(self.path)
+            self.buffer[device_index] = AVBuffer(self.path, sample_rate, max_channels)
             try:
                 output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.buffer[device_index].channels, samplerate=self.buffer[device_index].sample_rate, dtype=self.buffer[device_index].dtype)
                 self.streams[device_index] = output

@@ -225,9 +225,13 @@ class RetroBoard(tk.Tk):
         self.ptt_thread.start()
 
     def get_devices(self):
-        out = [(int(self.primary_device.get().split('.', 1)[0]) - 1, self.primary_gain)]
+        primary_index = int(self.primary_device.get().split('.', 1)[0]) - 1
+        primary_info = sounddevice.query_devices(primary_index)
+        out = [(primary_index, primary_info['default_samplerate'], primary_info['max_output_channels'], self.primary_gain)]
         if self.secondary_device_enable.get():
-            out.append(((int(self.secondary_device.get().split('.', 1)[0]) - 1), self.secondary_gain))
+            secondary_index = int(self.primary_device.get().split('.', 1)[0]) - 1
+            secondary_info = sounddevice.query_devices(secondary_index)
+            out.append((secondary_index, secondary_info['default_samplerate'], secondary_info['max_output_channels'], self.secondary_gain))
         return out
     
     def add_entry(self, filename, hotkeys_str='', hotkey=None):
