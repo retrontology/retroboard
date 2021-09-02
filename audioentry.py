@@ -25,7 +25,8 @@ class AudioEntry():
             frame_count = len(data)
             self.stop = True
         gain = self.gain[device_index].get()
-        data = np.vectorize(lambda x: apply_gain(x, gain))(data)
+        if gain != 0:
+            data = np.vectorize(lambda x: apply_gain(x, gain))(data)
         outdata[:frame_count] = data[:frame_count]
         outdata[frame_count:] = 0
     
