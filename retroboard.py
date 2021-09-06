@@ -21,7 +21,7 @@ from preferences import *
 import sys
 
 
-VERSION = '1.1.1'
+VERSION = '1.1.2'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
 
