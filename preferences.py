@@ -10,6 +10,8 @@ DEFAULT_STOP_ALL = set([keyboard.Key.pause])
 DEFAULT_PTT = set([keyboard.KeyCode(char='v')])
 DEFAULT_PTT_ENABLE = False
 DEFAULT_GAIN = 0
+DEFAULT_OVERLAP = True
+DEFAULT_OVERLAP_HOTKEY = set([keyboard.Key.home])
 
 class Preferences(dict):
 
@@ -28,6 +30,8 @@ class Preferences(dict):
         self.setdefault('ptt_enable', DEFAULT_PTT_ENABLE)
         self.setdefault('primary_gain', DEFAULT_GAIN)
         self.setdefault('secondary_gain', DEFAULT_GAIN)
+        self.setdefault('overlap', DEFAULT_OVERLAP)
+        self.setdefault('overlap_hotkey', DEFAULT_OVERLAP_HOTKEY)
 
     def load(self):
         self.clear()

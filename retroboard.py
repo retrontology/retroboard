@@ -68,7 +68,10 @@ class RetroBoard(tk.Tk):
         self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
         self.ptt_enable_var = tk.BooleanVar(self, self.prefs['ptt_enable'], 'ptt_enable')
-        self.ptt_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys), 'hotkey_ptt')
+        self.ptt_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys), 'ptt_hotkey')
+        self.overlap = tk.BooleanVar(self, self.prefs['overlap'], 'overlap')
+        self.hotkey_listener.set_hotkey('overlap_hotkey', RetroHotKey(self.prefs['overlap_hotkey'], self.toggle_overlap), HotkeyScope.GLOBAL)
+        self.overlap_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('overlap_hotkey', HotkeyScope.GLOBAL)._keys), 'overlap_hotkey')
 
     def on_exit(self):
         self.destroy()
@@ -216,9 +219,17 @@ class RetroBoard(tk.Tk):
     def toggle_ptt_enable(self):
         self.prefs['ptt_enable'] = self.ptt_enable_var.get()
     
+    def toggle_overlap(self):
+        self.overlap.set(not self.overlap.get())
+        self.prefs['overlap'] = self.overlap.get()
+    
     def play_entry(self, item):
         filename = self.audio_table.item(item)['values'][2]
-        af = AudioEntry(filename, self)
+        if not self.overlap.get():
+            for audio in self.playing:
+                if audio.item == item:
+                    audio.stop = True
+        af = AudioEntry(filename, item, self)
         self.playing.append(af)
         af.play()
         self.ptt_thread = Thread(target=self.ptt_press, daemon=True)

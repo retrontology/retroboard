@@ -6,8 +6,9 @@ from avbuffer import AVBuffer
 
 class AudioEntry():
     
-    def __init__(self, path:str, parent):
+    def __init__(self, path:str, item:str, parent):
         self.path = path
+        self.item = item
         self.parent = parent
         self.gain = dict()
         self.streams = dict()
