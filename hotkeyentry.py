@@ -8,7 +8,7 @@ import os
 
 
 class HotkeyEntry(tk.Entry):
-    def __init__(self, master=None, clearable:bool=True, stored=set(), stop_callback = None, cnf={}, **kw):
+    def __init__(self, master=None, clearable:bool=True, stored=None, stop_callback = None, cnf={}, **kw):
         kw['state'] = 'disabled'
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
@@ -16,7 +16,11 @@ class HotkeyEntry(tk.Entry):
         self.clearable = clearable
         self.hotkey_var: tk.StringVar = kw['textvariable']
         self.keys_pressed = set()
-        self.keys_stored = stored
+        if stored != None:
+            self.keys_stored = stored._keys
+        else:
+            self.keys_stored = set()
+            self.clear_hotkeys()
         self.capture = False
         self.capture_process = None
         self.bind('<ButtonRelease-1>', self.left_click_callback, '+')
@@ -28,11 +32,11 @@ class HotkeyEntry(tk.Entry):
             self.capture_process.start()
 
     def right_click_callback(self, key):
-        self.capture = False
         if self.clearable:
             self.keys_pressed.clear()
             self.keys_stored.clear()
             self.clear_hotkeys()
+        self.capture = False
     
     def stop(self):
         if self.capture:
@@ -98,3 +102,10 @@ class HotkeyEntry(tk.Entry):
                     else:
                         out += '?'
         return out
+    
+    @staticmethod
+    def hotkey_to_string(key):
+        if key != None:
+            return HotkeyEntry.set_to_string(key._keys)
+        else:
+            return set()

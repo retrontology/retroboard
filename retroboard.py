@@ -64,14 +64,22 @@ class RetroBoard(tk.Tk):
 
         # Global Hotkey Variables
         self.hotkey_listener.set_hotkey('stop_all', RetroHotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.GLOBAL)
-        self.hotkey_listener.set_hotkey('ptt', RetroHotKey(self.prefs['ptt'], None), HotkeyScope.GLOBAL)
+        if self.prefs['ptt'] != None:
+            ptt_hotkey = RetroHotKey(self.prefs['ptt'], None)
+        else:
+            ptt_hotkey = None
+        self.hotkey_listener.set_hotkey('ptt', ptt_hotkey, HotkeyScope.GLOBAL)
         self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
         self.ptt_enable_var = tk.BooleanVar(self, self.prefs['ptt_enable'], 'ptt_enable')
-        self.ptt_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys), 'ptt_hotkey')
+        self.ptt_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(ptt_hotkey), 'ptt_hotkey')
         self.overlap = tk.BooleanVar(self, self.prefs['overlap'], 'overlap')
-        self.hotkey_listener.set_hotkey('overlap_hotkey', RetroHotKey(self.prefs['overlap_hotkey'], self.toggle_overlap), HotkeyScope.GLOBAL)
-        self.overlap_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('overlap_hotkey', HotkeyScope.GLOBAL)._keys), 'overlap_hotkey')
+        if self.prefs['overlap_hotkey'] != None:
+            overlap_hotkey = RetroHotKey(self.prefs['overlap_hotkey'], self.toggle_overlap)
+        else:
+            overlap_hotkey = None
+        self.hotkey_listener.set_hotkey('overlap_hotkey', overlap_hotkey, HotkeyScope.GLOBAL)
+        self.overlap_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(overlap_hotkey), 'overlap_hotkey')
 
     def on_exit(self):
         self.destroy()
@@ -204,8 +212,9 @@ class RetroBoard(tk.Tk):
             self.secondary_device_menu.configure(state='disabled')
     
     def ptt_press(self):
-        keys = self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)._keys
-        if len(keys) > 0 and self.ptt_enable_var.get() and not self.ptt_pressed:
+        hotkey = self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)
+        if hotkey != None and self.ptt_enable_var.get() and not self.ptt_pressed:
+            keys = hotkey._keys
             self.ptt_pressed = True
             kbc = keyboard.Controller()
             while len(self.playing) > 0:
