@@ -28,7 +28,7 @@ class SettingsWindow(tk.Toplevel):
 
         # Stop All
         tk.Label(hotkey_frame, text="'Stop All Sounds' hotkey(s):", justify='left').grid(column=0, row=0, sticky='w')
-        self.stopall = HotkeyEntry(hotkey_frame, clearable=False, stored=self.master.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL), stop_callback=lambda x: self.bind_global_hotkey('stop_all', x, self.master.stop_all), textvariable=self.master.stopall_var)
+        self.stopall = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('stop_all', HotkeyScope.SETTINGS), stop_callback=lambda x: self.bind_global_hotkey('stop_all', x, self.master.stop_all), textvariable=self.master.stopall_var)
         self.stopall.grid(column=1, row=0, sticky='ew')
         self.stopall.bind('<Button>', lambda x: self.stop_other_entries(self.stopall), '+')
         self.hotkey_entries.add(self.stopall)
@@ -38,7 +38,7 @@ class SettingsWindow(tk.Toplevel):
         self.ptt_enable = tk.Checkbutton(hotkey_frame, variable=self.master.ptt_enable_var, command=self.master.toggle_ptt_enable)
         self.ptt_enable.grid(column=1, row=1, sticky='w')
         tk.Label(hotkey_frame, text="VoIP 'Push To Talk' hotkey(s):", justify='left').grid(column=0, row=2, sticky='w')
-        self.ptt = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL), stop_callback=lambda x: self.bind_global_hotkey('ptt', x, None), textvariable=self.master.ptt_var)
+        self.ptt = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('ptt', HotkeyScope.SETTINGS), stop_callback=lambda x: self.bind_global_hotkey('ptt', x, None), textvariable=self.master.ptt_var)
         self.ptt.grid(column=1, row=2, sticky='ew')
         self.ptt.bind('<Button>', lambda x: self.stop_other_entries(self.ptt), '+')
         self.hotkey_entries.add(self.ptt)
@@ -48,7 +48,7 @@ class SettingsWindow(tk.Toplevel):
         self.overlap_enable = tk.Checkbutton(hotkey_frame, variable=self.master.overlap, command=lambda: self.master.prefs.__setitem__('overlap', self.master.overlap.get()))
         self.overlap_enable.grid(column=1, row=3, sticky='w')
         tk.Label(hotkey_frame, text='Overlap Hotkey(s):', justify='left').grid(column=0, row=4, sticky='w')
-        self.overlap_hotkey = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('overlap_hotkey', HotkeyScope.GLOBAL), stop_callback=lambda x:self.bind_global_hotkey('overlap_hotkey', x, self.master.toggle_overlap), textvariable=self.master.overlap_var)
+        self.overlap_hotkey = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('overlap_hotkey', HotkeyScope.SETTINGS), stop_callback=lambda x:self.bind_global_hotkey('overlap_hotkey', x, self.master.toggle_overlap), textvariable=self.master.overlap_var)
         self.overlap_hotkey.grid(column=1, row=4, sticky='ew')
         self.overlap_hotkey.bind('<Button>', lambda x: self.stop_other_entries(self.overlap_hotkey), '+')
         self.hotkey_entries.add(self.overlap_hotkey)
@@ -60,7 +60,7 @@ class SettingsWindow(tk.Toplevel):
 
     def bind_global_hotkey(self, index, hkentry:HotkeyEntry, command):
         hotkey = hkentry.get_hotkey(command)
-        self.master.hotkey_listener.set_hotkey(index, hotkey, HotkeyScope.GLOBAL)
+        self.master.hotkey_listener.set_hotkey(index, hotkey, HotkeyScope.SETTINGS)
         if hotkey != None:
             self.master.prefs[index] = hotkey._keys
         else:

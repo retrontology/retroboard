@@ -3,7 +3,7 @@ from hotkey import RetroListener
 from enum import Enum
 
 class HotkeyScope(Enum):
-    GLOBAL = 0
+    SETTINGS = 0
     TABLE = 1
 
 class HotkeyListener():
@@ -16,7 +16,7 @@ class HotkeyListener():
         self._table_listeners = dict()
         
     def get_hotkey(self, index, scope):
-        if scope == HotkeyScope.GLOBAL:
+        if scope == HotkeyScope.SETTINGS:
             hotkeys = self._global_hotkeys
         elif scope == HotkeyScope.TABLE:
             hotkeys = self._table_hotkeys
@@ -26,7 +26,7 @@ class HotkeyListener():
             return None
     
     def set_hotkey(self, index, hotkey, scope:HotkeyScope):
-        if scope == HotkeyScope.GLOBAL:
+        if scope == HotkeyScope.SETTINGS:
             hotkeys = self._global_hotkeys
             listeners = self._global_listeners
         elif scope == HotkeyScope.TABLE:
@@ -47,7 +47,7 @@ class HotkeyListener():
             listeners[index] = None
     
     def remove_hotkey(self, index, scope:HotkeyScope):
-        if scope == HotkeyScope.GLOBAL:
+        if scope == HotkeyScope.SETTINGS:
             hotkeys = self._global_hotkeys
             listeners = self._global_listeners
         elif scope == HotkeyScope.TABLE:
@@ -61,7 +61,7 @@ class HotkeyListener():
             hotkeys.pop(index)
 
     def for_canonical(self, f, index, scope:HotkeyScope):
-        if scope == HotkeyScope.GLOBAL:
+        if scope == HotkeyScope.SETTINGS:
             listeners = self._global_listeners
         elif scope == HotkeyScope.TABLE:
             listeners = self._table_listeners

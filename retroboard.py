@@ -63,13 +63,13 @@ class RetroBoard(tk.Tk):
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
-        self.hotkey_listener.set_hotkey('stop_all', RetroHotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('stop_all', RetroHotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.SETTINGS)
         if self.prefs['ptt'] != None:
             ptt_hotkey = RetroHotKey(self.prefs['ptt'], None)
         else:
             ptt_hotkey = None
-        self.hotkey_listener.set_hotkey('ptt', ptt_hotkey, HotkeyScope.GLOBAL)
-        self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.GLOBAL)._keys), 'hotkey_stop_all')
+        self.hotkey_listener.set_hotkey('ptt', ptt_hotkey, HotkeyScope.SETTINGS)
+        self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.SETTINGS)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
         self.ptt_enable_var = tk.BooleanVar(self, self.prefs['ptt_enable'], 'ptt_enable')
         self.ptt_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(ptt_hotkey), 'ptt_hotkey')
@@ -78,7 +78,7 @@ class RetroBoard(tk.Tk):
             overlap_hotkey = RetroHotKey(self.prefs['overlap_hotkey'], self.toggle_overlap)
         else:
             overlap_hotkey = None
-        self.hotkey_listener.set_hotkey('overlap_hotkey', overlap_hotkey, HotkeyScope.GLOBAL)
+        self.hotkey_listener.set_hotkey('overlap_hotkey', overlap_hotkey, HotkeyScope.SETTINGS)
         self.overlap_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(overlap_hotkey), 'overlap_hotkey')
 
     def on_exit(self):
@@ -212,7 +212,7 @@ class RetroBoard(tk.Tk):
             self.secondary_device_menu.configure(state='disabled')
     
     def ptt_press(self):
-        hotkey = self.hotkey_listener.get_hotkey('ptt', HotkeyScope.GLOBAL)
+        hotkey = self.hotkey_listener.get_hotkey('ptt', HotkeyScope.SETTINGS)
         if hotkey != None and self.ptt_enable_var.get() and not self.ptt_pressed:
             keys = hotkey._keys
             self.ptt_pressed = True

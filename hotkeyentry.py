@@ -8,7 +8,7 @@ import os
 
 
 class HotkeyEntry(tk.Entry):
-    def __init__(self, master=None, clearable:bool=True, stored=None, stop_callback = None, cnf={}, **kw):
+    def __init__(self, master=None, clearable:bool=True, stored=None, stop_callback=None, cnf={}, **kw):
         kw['state'] = 'disabled'
         kw['disabledbackground'] = 'light gray'
         tk.Widget.__init__(self, master, 'entry', cnf, kw)
@@ -32,11 +32,9 @@ class HotkeyEntry(tk.Entry):
             self.capture_process.start()
 
     def right_click_callback(self, key):
+        self.stop()
         if self.clearable:
-            self.keys_pressed.clear()
-            self.keys_stored.clear()
             self.clear_hotkeys()
-        self.capture = False
     
     def stop(self):
         if self.capture:
@@ -61,7 +59,11 @@ class HotkeyEntry(tk.Entry):
             self.stop_callback(self)
 
     def clear_hotkeys(self):
+        self.keys_pressed.clear()
+        self.keys_stored.clear()
         self.hotkey_var.set('')
+        if self.stop_callback:
+            self.stop_callback(self)
     
     def key_press_callback(self, key):
         if not key in self.keys_pressed and key in self.keys_stored:
