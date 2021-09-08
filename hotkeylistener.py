@@ -20,7 +20,10 @@ class HotkeyListener():
             hotkeys = self._global_hotkeys
         elif scope == HotkeyScope.TABLE:
             hotkeys = self._table_hotkeys
-        return hotkeys[index]
+        if index in hotkeys:
+            return hotkeys[index]
+        else:
+            return None
     
     def set_hotkey(self, index, hotkey, scope:HotkeyScope):
         if scope == HotkeyScope.GLOBAL:

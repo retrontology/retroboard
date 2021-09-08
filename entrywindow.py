@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
 from hotkeyentry import HotkeyEntry
+from hotkeylistener import HotkeyScope
 
 class EntryWindow(tk.Toplevel):
 
@@ -51,7 +52,7 @@ class EntryWindow(tk.Toplevel):
         hotkey_frame.columnconfigure(0, weight=1)
         hotkey_frame.grid(column=0, row=2, sticky='we')
         tk.Label(hotkey_frame, text='HotKeys:').grid(column=0, row=0, sticky='w')
-        self.hotkey_entry = HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var)
+        self.hotkey_entry = HotkeyEntry(hotkey_frame, textvariable=self.hotkey_var, stored=self.master.hotkey_listener.get_hotkey(self.iid, HotkeyScope.TABLE))
         self.hotkey_entry.grid(column=0, row=1, sticky='we')
         tk.Label(hotkey_frame, text='* Right-click to clear hotkeys').grid(column=0, row=2, sticky='w')
 
