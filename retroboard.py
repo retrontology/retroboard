@@ -23,7 +23,7 @@ import sys
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 2
-VERSION_PATCH = 0
+VERSION_PATCH = 1
 VERSION = f'{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
@@ -67,18 +67,11 @@ class RetroBoard(tk.Tk):
 
         # Global Hotkey Variables
         if self.prefs['pause_all_hotkey'] != None:
-            pause_all_hotkey = RetroHotKey(self.prefs['pause_all_hotkey'], self.pause_all)
+            pause_all_hotkey = RetroHotKey(self.prefs['pause_all_hotkey'], self.pause_toggle_all)
         else:
             pause_all_hotkey = None
         self.hotkey_listener.set_hotkey('pause_all_hotkey', pause_all_hotkey, HotkeyScope.SETTINGS)
         self.pause_all_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(pause_all_hotkey), 'hotkey_pause_all')
-
-        if self.prefs['resume_all_hotkey'] != None:
-            resume_all_hotkey = RetroHotKey(self.prefs['resume_all_hotkey'], self.resume_all)
-        else:
-            resume_all_hotkey = None
-        self.hotkey_listener.set_hotkey('resume_all_hotkey', resume_all_hotkey, HotkeyScope.SETTINGS)
-        self.resume_all_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(resume_all_hotkey), 'hotkey_resume_all')
 
         if self.prefs['stop_all'] != None:
             stop_all_hotkey =  RetroHotKey(self.prefs['stop_all'], self.stop_all)
@@ -199,8 +192,6 @@ class RetroBoard(tk.Tk):
         play_button.grid(column=0, row=0, sticky='w', in_=playback_button_frame, padx=5)
         pause_button = tk.Button(playback_button_frame, text='Pause All', command=self.pause_button_callback)
         pause_button.grid(column=1, row=0, sticky='w', in_=playback_button_frame, padx=5)
-        resume_button = tk.Button(playback_button_frame, text='Resume All', command=self.resume_button_callback)
-        resume_button.grid(column=2, row=0, sticky='w', in_=playback_button_frame, padx=5)
         stop_button = tk.Button(playback_button_frame, text='Stop All', command=self.stop_button_callback)
         stop_button.grid(column=3, row=0, sticky='w', in_=playback_button_frame, padx=5)
 
@@ -324,15 +315,18 @@ class RetroBoard(tk.Tk):
         self.stop_all()
     
     def pause_button_callback(self):
-        self.pause_all()
-    
-    def resume_button_callback(self):
-        self.resume_all()
+        self.pause_toggle_all()
     
     def stop_all(self):
         for clip in self.playing.copy():
             clip.stop = True
     
+    def pause_toggle_all(self):
+        if any([not x.pause for x in self.playing]):
+            self.pause_all()
+        else:
+            self.resume_all()
+
     def pause_all(self):
         for clip in self.playing:
             clip.pause = True
