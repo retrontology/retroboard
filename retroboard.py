@@ -296,13 +296,11 @@ class RetroBoard(tk.Tk):
         EntryWindow(self)
 
     def remove_button_callback(self):
-        item = self.audio_table.focus()
-        if item:
-            self.audio_table.delete(item)
+        for index in self.audio_table.selection():
+            self.audio_table.delete(index)
 
     def edit_button_callback(self):
-        index = self.audio_table.focus()
-        if index:
+        for index in self.audio_table.selection():
             item = self.audio_table.item(index)
             EntryWindow(self, item['values'][2], item['values'][1], index)
 
