@@ -21,8 +21,8 @@ from preferences import *
 import sys
 
 VERSION_MAJOR = 1
-VERSION_MINOR = 1
-VERSION_PATCH = 2
+VERSION_MINOR = 2
+VERSION_PATCH = 0
 VERSION = f'{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
@@ -175,9 +175,13 @@ class RetroBoard(tk.Tk):
         playback_button_frame = tk.Frame(button_frame)
         playback_button_frame.pack(side='right', padx=8)
         play_button = tk.Button(playback_button_frame, text='Play', command=self.play_button_callback)
-        play_button.grid(column=0, row=0, sticky='w', in_=playback_button_frame, padx=8)
+        play_button.grid(column=0, row=0, sticky='w', in_=playback_button_frame, padx=5)
+        pause_button = tk.Button(playback_button_frame, text='Pause All', command=self.pause_button_callback)
+        pause_button.grid(column=1, row=0, sticky='w', in_=playback_button_frame, padx=5)
+        resume_button = tk.Button(playback_button_frame, text='Resume All', command=self.resume_button_callback)
+        resume_button.grid(column=2, row=0, sticky='w', in_=playback_button_frame, padx=5)
         stop_button = tk.Button(playback_button_frame, text='Stop All', command=self.stop_button_callback)
-        stop_button.grid(column=1, row=0, sticky='w', in_=playback_button_frame, padx=8)
+        stop_button.grid(column=3, row=0, sticky='w', in_=playback_button_frame, padx=5)
 
     def create_device_selection(self, frame):
         # Device selection frame
@@ -298,9 +302,23 @@ class RetroBoard(tk.Tk):
     def stop_button_callback(self):
         self.stop_all()
     
+    def pause_button_callback(self):
+        self.pause_all()
+    
+    def resume_button_callback(self):
+        self.resume_all()
+    
     def stop_all(self):
         for clip in self.playing.copy():
             clip.stop = True
+    
+    def pause_all(self):
+        for clip in self.playing:
+            clip.pause = True
+    
+    def resume_all(self):
+        for clip in self.playing:
+            clip.resume()
     
     def file_save_callback(self):
         default_file = self._savefile.get()
