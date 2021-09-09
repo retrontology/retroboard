@@ -1,3 +1,4 @@
+from tkinter.constants import E
 from hotkeyentry import HotkeyEntry
 import tkinter as tk
 from tkinter import ttk
@@ -65,16 +66,36 @@ class RetroBoard(tk.Tk):
         self.secondary_device_enable = tk.BooleanVar(self, False, 'secondary_device_enable')
 
         # Global Hotkey Variables
-        self.hotkey_listener.set_hotkey('stop_all', RetroHotKey(self.prefs['stop_all'], self.stop_all), HotkeyScope.SETTINGS)
+        if self.prefs['pause_all_hotkey'] != None:
+            pause_all_hotkey = RetroHotKey(self.prefs['pause_all_hotkey'], self.pause_all)
+        else:
+            pause_all_hotkey = None
+        self.hotkey_listener.set_hotkey('pause_all_hotkey', pause_all_hotkey, HotkeyScope.SETTINGS)
+        self.pause_all_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(pause_all_hotkey), 'hotkey_pause_all')
+
+        if self.prefs['resume_all_hotkey'] != None:
+            resume_all_hotkey = RetroHotKey(self.prefs['resume_all_hotkey'], self.resume_all)
+        else:
+            resume_all_hotkey = None
+        self.hotkey_listener.set_hotkey('resume_all_hotkey', resume_all_hotkey, HotkeyScope.SETTINGS)
+        self.resume_all_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(resume_all_hotkey), 'hotkey_resume_all')
+
+        if self.prefs['stop_all'] != None:
+            stop_all_hotkey =  RetroHotKey(self.prefs['stop_all'], self.stop_all)
+        else:
+            stop_all_hotkey = None
+        self.hotkey_listener.set_hotkey('stop_all', stop_all_hotkey, HotkeyScope.SETTINGS)
+        self.stopall_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(stop_all_hotkey), 'hotkey_stop_all')
+
         if self.prefs['ptt'] != None:
             ptt_hotkey = RetroHotKey(self.prefs['ptt'], None)
         else:
             ptt_hotkey = None
         self.hotkey_listener.set_hotkey('ptt', ptt_hotkey, HotkeyScope.SETTINGS)
-        self.stopall_var = tk.StringVar(self, HotkeyEntry.set_to_string(self.hotkey_listener.get_hotkey('stop_all', HotkeyScope.SETTINGS)._keys), 'hotkey_stop_all')
         self.ptt_pressed = False
         self.ptt_enable_var = tk.BooleanVar(self, self.prefs['ptt_enable'], 'ptt_enable')
         self.ptt_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(ptt_hotkey), 'ptt_hotkey')
+
         self.overlap = tk.BooleanVar(self, self.prefs['overlap'], 'overlap')
         if self.prefs['overlap_hotkey'] != None:
             overlap_hotkey = RetroHotKey(self.prefs['overlap_hotkey'], self.toggle_overlap)
