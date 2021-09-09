@@ -12,15 +12,16 @@ class AudioEntry():
         self.parent = parent
         self.gain = dict()
         self.streams = dict()
+        self.pause = False
         self.stop = False
         self.buffer = dict()
-    
+        self.devices = dict()
+        
     def playback_callback(self, device_index, outdata, frame_count, time_info, status):
         if status:
             print(status)
-        if self.stop:
+        if self.stop or self.pause:
             raise sounddevice.CallbackStop
-        
         data = self.buffer[device_index].read(frame_count)
         if len(data) < frame_count:
             frame_count = len(data)
@@ -32,12 +33,14 @@ class AudioEntry():
         outdata[frame_count:] = 0
     
     def playback_finished(self, device_index):
-        self.streams.pop(device_index).close()
-        self.buffer.pop(device_index).close()
-        self.gain.pop(device_index)
-        if self in self.parent.playing:
-            self.parent.playing.remove(self)
-        del self
+        if self.stop:
+            self.streams.pop(device_index).close()
+            self.buffer.pop(device_index).close()
+            self.gain.pop(device_index)
+            self.devices.pop(device_index)
+            if self in self.parent.playing:
+                self.parent.playing.remove(self)
+            del self
 
     def play(self):
         self.playback_thread = Thread(target=self._play, daemon=True)
@@ -48,13 +51,30 @@ class AudioEntry():
         for device, sample_rate, max_channels, gain in self.parent.get_devices():
             self.gain[device_index] = gain
             self.buffer[device_index] = AVBuffer(self.path, sample_rate, max_channels)
+            self.devices[device_index] = device
             try:
-                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=device, channels=self.buffer[device_index].channels, samplerate=self.buffer[device_index].sample_rate, dtype=self.buffer[device_index].dtype)
+                output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=self.devices[device_index], channels=self.buffer[device_index].channels, samplerate=self.buffer[device_index].sample_rate, dtype=self.buffer[device_index].dtype)
                 self.streams[device_index] = output
                 output.start()
                 device_index += 1
             except Exception as e:
                 self.parent.error(e)
+    
+    def resume(self):
+        self.playback_thread = Thread(target=self._resume, daemon=True)
+        self.playback_thread.start()
+    
+    def _resume(self):
+        if self.pause and not self.stop:
+            self.pause = False
+            for device_index in self.streams:
+                try:
+                    output = sounddevice.OutputStream(callback=partial(self.playback_callback, device_index), finished_callback=partial(self.playback_finished, device_index), device=self.devices[device_index], channels=self.buffer[device_index].channels, samplerate=self.buffer[device_index].sample_rate, dtype=self.buffer[device_index].dtype)
+                    self.streams[device_index] = output
+                    output.start()
+                except Exception as e:
+                    self.parent.error(e)
+
 
 def apply_gain(input, gain):
     return 10**(gain/10)*input
