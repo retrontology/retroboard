@@ -235,6 +235,9 @@ class RetroBoard(tk.Tk):
             keys = hotkey._keys
             self.ptt_pressed = True
             kbc = keyboard.Controller()
+            for key in keys:
+                kbc.press(key)
+            sleep(0.1)
             while len(self.playing) > 0 and any([not x.pause for x in self.playing]):
                 for key in keys:
                     kbc.press(key)
@@ -251,6 +254,8 @@ class RetroBoard(tk.Tk):
         self.prefs['overlap'] = self.overlap.get()
     
     def play_entry(self, item):
+        self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
+        self.ptt_thread.start()
         filename = self.audio_table.item(item)['values'][2]
         if not self.overlap.get():
             for audio in self.playing:
@@ -259,8 +264,7 @@ class RetroBoard(tk.Tk):
         af = AudioEntry(filename, item, self)
         self.playing.append(af)
         af.play()
-        self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
-        self.ptt_thread.start()
+        
 
     def get_devices(self):
         primary_index = int(self.primary_device.get().split('.', 1)[0]) - 1
@@ -330,10 +334,11 @@ class RetroBoard(tk.Tk):
             clip.pause = True
     
     def resume_all(self):
-        for clip in self.playing:
-            clip.resume()
         self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
         self.ptt_thread.start()
+        for clip in self.playing:
+            clip.resume()
+        
     
     def file_save_callback(self):
         default_file = self._savefile.get()
