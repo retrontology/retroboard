@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from hotkeyentry import HotkeyEntry
 from hotkeylistener import HotkeyScope
 
@@ -43,6 +44,9 @@ class SettingsWindow(tk.Toplevel):
         self.hotkey_entries.add(self.stopall)
         hotkey_row_index += 1
 
+        ttk.Separator(hotkey_frame, orient='horizontal').grid(column=0, columnspan=2, row=hotkey_row_index, sticky='ew', pady=5)
+        hotkey_row_index += 1
+
         # Push To Talk
         tk.Label(hotkey_frame, text="VoIP 'Push To Talk' enabled:", justify='left').grid(column=0, row=hotkey_row_index, sticky='w')
         self.ptt_enable = tk.Checkbutton(hotkey_frame, variable=self.master.ptt_enable_var, command=self.master.toggle_ptt_enable)
@@ -53,6 +57,9 @@ class SettingsWindow(tk.Toplevel):
         self.ptt.grid(column=1, row=hotkey_row_index, sticky='ew')
         self.ptt.bind('<Button>', lambda x: self.stop_other_entries(self.ptt), '+')
         self.hotkey_entries.add(self.ptt)
+        hotkey_row_index += 1
+
+        ttk.Separator(hotkey_frame, orient='horizontal').grid(column=0, columnspan=2, row=hotkey_row_index, sticky='ew', pady=5)
         hotkey_row_index += 1
 
         # Overlap
