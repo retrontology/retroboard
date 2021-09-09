@@ -9,6 +9,8 @@ DEFAULT_SAVE = 'default.rbd'
 DEFAULT_STOP_ALL = set([keyboard.Key.end])
 DEFAULT_PTT = set([keyboard.KeyCode(char='v')])
 DEFAULT_PTT_ENABLE = False
+DEFAULT_PTT_PRE_TIME = 0
+DEFAULT_PTT_POST_TIME = 0.1
 DEFAULT_GAIN = 0
 DEFAULT_OVERLAP = True
 DEFAULT_OVERLAP_HOTKEY = set([keyboard.Key.home])
@@ -36,6 +38,8 @@ class Preferences(dict):
         self.setdefault('overlap_hotkey', DEFAULT_OVERLAP_HOTKEY)
         self.setdefault('pause_all_hotkey', DEFAULT_PAUSE_ALL_HOTKEY)
         self.setdefault('resume_all_hotkey', DEFAULT_RESUME_ALL_HOTKEY)
+        self.setdefault('ptt_pre_time', DEFAULT_PTT_PRE_TIME)
+        self.setdefault('ptt_post_time', DEFAULT_PTT_POST_TIME)
 
     def load(self):
         self.clear()

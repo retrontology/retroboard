@@ -16,7 +16,7 @@ from hotkey import RetroHotKey
 import os
 import pickle
 import webbrowser
-from time import sleep
+from time import sleep, time
 from threading import Thread
 from preferences import *
 import sys
@@ -80,6 +80,8 @@ class RetroBoard(tk.Tk):
         self.hotkey_listener.set_hotkey('stop_all', stop_all_hotkey, HotkeyScope.SETTINGS)
         self.stopall_var = tk.StringVar(self, HotkeyEntry.hotkey_to_string(stop_all_hotkey), 'hotkey_stop_all')
 
+        self.ptt_pre_time = tk.DoubleVar(self, self.prefs['ptt_pre_time'], 'ptt_pre_time')
+        self.ptt_post_time = tk.DoubleVar(self, self.prefs['ptt_post_time'], 'ptt_post_time')
         if self.prefs['ptt'] != None:
             ptt_hotkey = RetroHotKey(self.prefs['ptt'], None)
         else:
@@ -232,16 +234,24 @@ class RetroBoard(tk.Tk):
     def ptt_press(self):
         hotkey = self.hotkey_listener.get_hotkey('ptt', HotkeyScope.SETTINGS)
         if hotkey != None and self.ptt_enable_var.get() and not self.ptt_pressed:
-            keys = hotkey._keys
             self.ptt_pressed = True
+            keys = hotkey._keys
             kbc = keyboard.Controller()
-            for key in keys:
-                kbc.press(key)
-            sleep(0.1)
+            end_time = time() + self.ptt_pre_time.get() + 0.1
+            while time() < end_time:
+                for key in keys:
+                    kbc.press(key)
+                sleep(0.1)
             while len(self.playing) > 0 and any([not x.pause for x in self.playing]):
                 for key in keys:
                     kbc.press(key)
                 sleep(0.1)
+            if self.ptt_post_time.get():
+                end_time = time() + self.ptt_post_time.get()
+                while time() < end_time:
+                    for key in keys:
+                        kbc.press(key)
+                    sleep(0.1)
             for key in keys:
                 kbc.release(key)
             self.ptt_pressed = False
@@ -254,8 +264,10 @@ class RetroBoard(tk.Tk):
         self.prefs['overlap'] = self.overlap.get()
     
     def play_entry(self, item):
-        self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
-        self.ptt_thread.start()
+        if not self.ptt_pressed:
+            self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
+            self.ptt_thread.start()
+            sleep(self.ptt_pre_time.get())
         filename = self.audio_table.item(item)['values'][2]
         if not self.overlap.get():
             for audio in self.playing:
@@ -334,8 +346,10 @@ class RetroBoard(tk.Tk):
             clip.pause = True
     
     def resume_all(self):
-        self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
-        self.ptt_thread.start()
+        if not self.ptt_pressed:
+            self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
+            self.ptt_thread.start()
+            sleep(self.ptt_pre_time.get())
         for clip in self.playing:
             clip.resume()
         

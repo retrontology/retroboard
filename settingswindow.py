@@ -58,6 +58,14 @@ class SettingsWindow(tk.Toplevel):
         self.ptt.bind('<Button>', lambda x: self.stop_other_entries(self.ptt), '+')
         self.hotkey_entries.add(self.ptt)
         hotkey_row_index += 1
+        tk.Label(hotkey_frame, text="VoIP 'Push To Talk' pre delay time:", justify='left').grid(column=0, row=hotkey_row_index, sticky='w')
+        self.ptt_pre_time = ttk.Spinbox(hotkey_frame, from_=0.0, to=60.0, increment=0.1, textvariable=self.master.ptt_pre_time, wrap=False)
+        self.ptt_pre_time.grid(column=1, row=hotkey_row_index, sticky='w')
+        hotkey_row_index += 1
+        tk.Label(hotkey_frame, text="VoIP 'Push To Talk' post delay time:", justify='left').grid(column=0, row=hotkey_row_index, sticky='w')
+        self.ptt_post_time = ttk.Spinbox(hotkey_frame, from_=0.0, to=60.0, increment=0.1, textvariable=self.master.ptt_post_time, wrap=False)
+        self.ptt_post_time.grid(column=1, row=hotkey_row_index, sticky='w')
+        hotkey_row_index += 1
 
         ttk.Separator(hotkey_frame, orient='horizontal').grid(column=0, columnspan=2, row=hotkey_row_index, sticky='ew', pady=5)
         hotkey_row_index += 1
@@ -91,4 +99,7 @@ class SettingsWindow(tk.Toplevel):
         self.stopall.stop()
         self.ptt.stop()
         self.destroy()
+        self.master.prefs['ptt_pre_time'] = self.master.ptt_pre_time.get()
+        self.master.prefs['ptt_post_time'] = self.master.ptt_post_time.get()
+        self.master.prefs.save()
         self.master.settings_window = None
