@@ -223,7 +223,7 @@ class RetroBoard(tk.Tk):
             keys = hotkey._keys
             self.ptt_pressed = True
             kbc = keyboard.Controller()
-            while len(self.playing) > 0:
+            while len(self.playing) > 0 and any([not x.pause for x in self.playing]):
                 for key in keys:
                     kbc.press(key)
                 sleep(0.1)
@@ -319,6 +319,8 @@ class RetroBoard(tk.Tk):
     def resume_all(self):
         for clip in self.playing:
             clip.resume()
+        self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
+        self.ptt_thread.start()
     
     def file_save_callback(self):
         default_file = self._savefile.get()
