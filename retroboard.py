@@ -265,8 +265,7 @@ class RetroBoard(tk.Tk):
     
     def play_entry(self, item):
         if not self.ptt_pressed:
-            self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
-            self.ptt_thread.start()
+            Thread(target=self.ptt_press, daemon=True).start()
             sleep(self.ptt_pre_time.get())
         filename = self.audio_table.item(item)['values'][2]
         if not self.overlap.get():
@@ -347,8 +346,7 @@ class RetroBoard(tk.Tk):
     
     def resume_all(self):
         if not self.ptt_pressed:
-            self.ptt_thread = Thread(target=self.ptt_press, daemon=True)
-            self.ptt_thread.start()
+            Thread(target=self.ptt_press, daemon=True).start()
             sleep(self.ptt_pre_time.get())
         for clip in self.playing:
             clip.resume()
