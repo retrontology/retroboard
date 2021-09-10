@@ -23,7 +23,7 @@ import sys
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 2
-VERSION_PATCH = 1
+VERSION_PATCH = 2
 VERSION = f'{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}'
 GITHUB_URL = 'https://github.com/retrontology/retroboard'
 ICON_FILE = os.path.join(os.path.dirname(__file__), 'icon/RB.png')
