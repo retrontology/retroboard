@@ -30,7 +30,7 @@ class SettingsWindow(tk.Toplevel):
 
         # Pause All
         tk.Label(hotkey_frame, text="'Pause/Resume All Sounds' hotkey(s):", justify='left').grid(column=0, row=hotkey_row_index, sticky='w')
-        self.pause_all = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('pause_all_hotkey', HotkeyScope.SETTINGS), stop_callback=lambda x: self.bind_global_hotkey('pause_all_hotkey', x, self.master.pause_all_toggle), textvariable=self.master.pause_all_var)
+        self.pause_all = HotkeyEntry(hotkey_frame, clearable=True, stored=self.master.hotkey_listener.get_hotkey('pause_all_hotkey', HotkeyScope.SETTINGS), stop_callback=lambda x: self.bind_global_hotkey('pause_all_hotkey', x, self.master.pause_toggle_all), textvariable=self.master.pause_all_var)
         self.pause_all.grid(column=1, row=hotkey_row_index, sticky='ew')
         self.pause_all.bind('<Button>', lambda x: self.stop_other_entries(self.pause_all), '+')
         self.hotkey_entries.add(self.pause_all)
