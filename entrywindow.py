@@ -8,6 +8,7 @@ class EntryWindow(tk.Toplevel):
 
     def __init__(self, master=None, filename=None, hotkeys=None, iid=None):
         super().__init__(master)
+        self.title('Audio Entry')
         self.master = master
         self.iid = iid
         self.setup_variables(filename, hotkeys)

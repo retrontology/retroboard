@@ -7,6 +7,7 @@ class SettingsWindow(tk.Toplevel):
     
     def __init__(self, master=None):
         super().__init__(master)
+        self.title('Settings')
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.master = master
         self.minsize(450,80)
