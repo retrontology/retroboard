@@ -69,7 +69,10 @@ class EntryWindow(tk.Toplevel):
 
     def browse_files(self):
         self.hotkey_entry.stop()
-        filenames = filedialog.askopenfilenames()
+        try:
+            filenames = filedialog.askopenfilenames(parent=self)
+        except tk.TclError as e:
+            return
         if len(filenames) == 1:
             self.filename_var.set(filenames[0])
         elif len(filenames) > 1:
