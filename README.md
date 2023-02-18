@@ -17,7 +17,7 @@ git clone https://github.com/retrontology/retroboard
 cd retroboard
 python -m pip install -r requirements.txt
 ```
-## Runing the Program
+## Run the Program
 ```
 python retroboard.py
 ```
